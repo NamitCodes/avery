@@ -3,6 +3,7 @@ import { api } from '../../api';
 import { PassCard } from '../../components/PassCard';
 import { ErrorMessage, useLoad } from '../../components/ui';
 import type { Pass } from './types';
+import { Button } from '../../components/fui';
 
 /** Desk reprint of the current pass (staff only; the action is audited server-side). */
 export function PassPrintPage() {
@@ -12,12 +13,12 @@ export function PassPrintPage() {
   return (
     <main>
       <div className="no-print row" style={{ justifyContent: 'space-between', marginBottom: '1.5rem' }}>
-        <button className="btn-secondary" onClick={() => navigate(-1)}>
+        <Button variant="subtle" onClick={() => navigate(-1)}>
           ← Back
-        </button>
-        <button onClick={() => window.print()} disabled={!data}>
+        </Button>
+        <Button variant="solid" onClick={() => window.print()} disabled={!data}>
           Print
-        </button>
+        </Button>
       </div>
       <ErrorMessage error={error} />
       {data && <PassCard pass={data.pass} />}

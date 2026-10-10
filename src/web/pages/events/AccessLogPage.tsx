@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, qs } from '../../api';
-import { ErrorMessage, StatusBadge, useLoad } from '../../components/ui';
+import { ErrorMessage, StatusBadge, TableWrap, useLoad } from '../../components/ui';
 import { formatDateTime } from '../../format';
 import { useEventContext } from './EventLayout';
+import { buttonClass, Input, Select } from '../../components/fui';
 
 interface Row {
   id: string;
@@ -26,12 +27,12 @@ export function AccessLogPage() {
   const [f, setF] = useState({ result: '', event_type: '', source: '', from: '', to: '' });
   const { data, error } = useLoad(() => api.get<{ access_events: Row[] }>(`/admin/events/${e.id}/access-events${qs({ ...f, limit: '500' })}`), [e.id, JSON.stringify(f)]);
   const sel = (k: keyof typeof f, options: string[]) => (
-    <select value={f[k]} onChange={(ev) => setF({ ...f, [k]: ev.target.value })}>
+    <Select value={f[k]} onChange={(ev) => setF({ ...f, [k]: ev.target.value })}>
       <option value="">Any</option>
       {options.map((o) => (
         <option key={o}>{o}</option>
       ))}
-    </select>
+    </Select>
   );
   return (
     <>
@@ -50,14 +51,14 @@ export function AccessLogPage() {
         </label>
         <label>
           From
-          <input type="date" value={f.from} onChange={(ev) => setF({ ...f, from: ev.target.value })} />
+          <Input type="date" value={f.from} onChange={(ev) => setF({ ...f, from: ev.target.value })} />
         </label>
         <label>
           To
-          <input type="date" value={f.to} onChange={(ev) => setF({ ...f, to: ev.target.value })} />
+          <Input type="date" value={f.to} onChange={(ev) => setF({ ...f, to: ev.target.value })} />
         </label>
         {canManage && (
-          <a className="btn btn-secondary" href={`/api/admin/events/${e.id}/access-events/export.csv${qs(f)}`}>
+          <a className={buttonClass({ variant: 'subtle' })} href={`/api/admin/events/${e.id}/access-events/export.csv${qs(f)}`}>
             Export CSV
           </a>
         )}
@@ -65,7 +66,7 @@ export function AccessLogPage() {
       <ErrorMessage error={error} />
       {data && data.access_events.length === 0 && <p className="muted">No access records.</p>}
       {data && data.access_events.length > 0 && (
-        <div className="table-wrap">
+        <TableWrap>
           <table>
             <thead>
               <tr>
@@ -103,7 +104,7 @@ export function AccessLogPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       )}
     </>
   );

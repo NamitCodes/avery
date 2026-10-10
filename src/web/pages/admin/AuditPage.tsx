@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { api, qs, type AuditLog } from '../../api';
-import { ErrorMessage, useLoad } from '../../components/ui';
+import { ErrorMessage, TableWrap, useLoad } from '../../components/ui';
 import { formatDateTime } from '../../format';
+import { Input, Select } from '../../components/fui';
 
 const ENTITY_TYPES = [
   'session', 'location', 'venue_qr_code', 'attendance_record', 'volunteer',
@@ -38,21 +39,21 @@ export function AuditPage() {
       <div className="filters">
         <label>
           Record type
-          <select value={entityType} onChange={(e) => setEntityType(e.target.value)}>
+          <Select value={entityType} onChange={(e) => setEntityType(e.target.value)}>
             <option value="">All</option>
             {ENTITY_TYPES.map((t) => (
               <option key={t}>{t}</option>
             ))}
-          </select>
+          </Select>
         </label>
         <label>
           Action starts with
-          <input placeholder="e.g. attendance." value={action} onChange={(e) => setAction(e.target.value)} />
+          <Input placeholder="e.g. attendance." value={action} onChange={(e) => setAction(e.target.value)} />
         </label>
       </div>
       <ErrorMessage error={error} />
       {data && (
-        <div className="table-wrap">
+        <TableWrap>
           <table>
             <thead>
               <tr>
@@ -76,7 +77,7 @@ export function AuditPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       )}
     </>
   );

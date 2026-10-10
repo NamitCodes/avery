@@ -4,6 +4,7 @@ import { api, type Location, type Session, type SessionListItem } from '../../ap
 import { BigQr, DemoPageShell, DemoStep, usePolling, usePresenter } from '../../components/demoKit';
 import { ErrorMessage } from '../../components/ui';
 import { formatTimeWithSeconds } from '../../format';
+import { Button, Input } from '../../components/fui';
 
 const VENUE_NAME = 'Science of the Soul – Amber';
 /** Names used by earlier versions of this demo; renamed in place so printed QRs keep working. */
@@ -111,10 +112,10 @@ export function DemoVolunteerPage() {
           <p className="muted">No session is open at {VENUE_NAME} yet.</p>
         )}
         <div className="row">
-          <input value={title} onChange={(e) => setTitle(e.target.value)} style={{ maxWidth: 320 }} aria-label="Session title" />
-          <button onClick={createSession} disabled={busy || !venue || !title.trim()}>
+          <Input value={title} onChange={(e) => setTitle(e.target.value)} style={{ maxWidth: 320 }} aria-label="Session title" />
+          <Button variant="solid" onClick={createSession} disabled={busy || !venue || !title.trim()}>
             {session ? 'Create another session' : 'Create & open session'}
-          </button>
+          </Button>
         </div>
       </DemoStep>
 

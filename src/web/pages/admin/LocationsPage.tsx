@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { api, type Location } from '../../api';
-import { ErrorMessage, StatusBadge, useLoad } from '../../components/ui';
+import { ErrorMessage, StatusBadge, TableWrap, useLoad } from '../../components/ui';
+import { Button, Input, Select } from '../../components/fui';
 
 export const TIMEZONES: string[] = (() => {
   try {
@@ -38,7 +39,7 @@ export function LocationsPage() {
       <p className="muted">Each venue has one reusable printed QR code. The QR identifies the venue only; volunteers must still sign in.</p>
       <ErrorMessage error={list.error} />
       {list.data && (
-        <div className="table-wrap">
+        <TableWrap>
           <table>
             <thead>
               <tr>
@@ -72,7 +73,7 @@ export function LocationsPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       )}
 
       <div className="section" style={{ maxWidth: 560 }}>
@@ -80,22 +81,22 @@ export function LocationsPage() {
         <form onSubmit={create}>
           <label>
             Name
-            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           </label>
           <label>
             Address
-            <input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+            <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
           </label>
           <label>
             Time zone
-            <select value={form.timezone} onChange={(e) => setForm({ ...form, timezone: e.target.value })}>
+            <Select value={form.timezone} onChange={(e) => setForm({ ...form, timezone: e.target.value })}>
               {TIMEZONES.map((tz) => (
                 <option key={tz}>{tz}</option>
               ))}
-            </select>
+            </Select>
           </label>
           <ErrorMessage error={error} />
-          <button disabled={busy}>Create venue & QR code</button>
+          <Button variant="solid" disabled={busy}>Create venue & QR code</Button>
         </form>
       </div>
     </>

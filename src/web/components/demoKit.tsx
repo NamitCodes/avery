@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Link } from 'react-router-dom';
 import { api, type User } from '../api';
 import { useAuth } from '../auth';
 import { loadDemo, type DemoInfo } from '../demoInfo';
 import { ErrorMessage, Modal } from './ui';
+import { Button, Crumbs } from './fui';
 
 /** Sign in as a demo account (no-op if already signed in as it). */
 export async function signInAsDemo(demo: DemoInfo, key: string, current: User | null, setUser: (u: User) => void) {
@@ -60,9 +60,7 @@ export function DemoPageShell({ title, intro, demo, error, children }: { title: 
   }
   return (
     <div className="simple-demo">
-      <p className="small muted">
-        <Link to="/demo">Demos</Link> /
-      </p>
+      <Crumbs items={[{ label: 'Demos', to: "/demo" }]} current={title} />
       <h1>{title}</h1>
       <p className="lead">{intro}</p>
       <PhoneReachability demo={demo} />
@@ -139,9 +137,9 @@ export function ResetDemoButton({ label = 'Reset demo data' }: { label?: string 
 
   return (
     <>
-      <button className="btn-danger" onClick={() => setOpen(true)}>
+      <Button variant="solid" theme="red" onClick={() => setOpen(true)}>
         {label}
-      </button>
+      </Button>
       {open && (
         <Modal title="Reset demo data?" onClose={() => !busy && setOpen(false)}>
           <p>
@@ -151,12 +149,12 @@ export function ResetDemoButton({ label = 'Reset demo data' }: { label?: string 
           {busy && <p className="muted">Resetting… this takes 10–30 seconds. Please keep this page open.</p>}
           <ErrorMessage error={error} />
           <div className="actions">
-            <button className="btn-secondary" disabled={busy} onClick={() => setOpen(false)}>
+            <Button variant="subtle" disabled={busy} onClick={() => setOpen(false)}>
               Cancel
-            </button>
-            <button className="btn-danger" disabled={busy} onClick={reset}>
+            </Button>
+            <Button variant="solid" theme="red" disabled={busy} onClick={reset}>
               {busy ? 'Resetting…' : 'Yes, reset everything'}
-            </button>
+            </Button>
           </div>
         </Modal>
       )}

@@ -4,6 +4,7 @@ import { useAuth } from '../../auth';
 import { ErrorMessage, StatusBadge, useLoad } from '../../components/ui';
 import { formatRange } from '../../format';
 import type { EventRecord } from './types';
+import { buttonClass, Crumbs } from '../../components/fui';
 
 export interface EventContext {
   event: EventRecord;
@@ -24,15 +25,13 @@ export function EventLayout() {
   const base = `/admin/events/${eventId}`;
   return (
     <>
-      <p className="small muted">
-        <Link to="/admin/events">Events</Link> /
-      </p>
+      <Crumbs items={[{ label: 'Events', to: "/admin/events" }]} current={e.name} />
       <div className="spread">
         <h1 style={{ marginBottom: '0.25rem' }}>
           {e.name} <StatusBadge status={e.status} />
         </h1>
         {e.status === 'ACTIVE' && (
-          <Link className="btn btn-secondary" to={`/staff/desk/${e.id}`}>
+          <Link className={buttonClass({ variant: 'subtle' })} to={`/staff/desk/${e.id}`}>
             Exception desk
           </Link>
         )}

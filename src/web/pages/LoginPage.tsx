@@ -4,6 +4,7 @@ import { api, type User } from '../api';
 import { useAuth } from '../auth';
 import { ErrorMessage } from '../components/ui';
 import { useDemo } from '../demoInfo';
+import { Button, Input } from '../components/fui';
 
 /** Only allow same-site relative redirects after sign-in. */
 function safeNext(next: string | null) {
@@ -75,16 +76,16 @@ export function LoginPage() {
       <form onSubmit={submit}>
         <label>
           Email
-          <input type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <Input type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </label>
         <label>
           Password
-          <input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+          <Input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </label>
         <ErrorMessage error={error} />
-        <button className="btn-block" disabled={busy}>
+        <Button variant="solid" size="lg" className="w-full" disabled={busy}>
           {busy ? 'Signing in…' : 'Sign in'}
-        </button>
+        </Button>
       </form>
       <p className="muted small" style={{ marginTop: '1.25rem' }}>
         New volunteer? <Link to={`/register?next=${encodeURIComponent(next)}`}>Create an account</Link>
@@ -125,15 +126,15 @@ export function RegisterPage() {
       <form onSubmit={submit}>
         <label>
           Full name
-          <input autoComplete="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+          <Input autoComplete="name" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
         </label>
         <label>
           Email
-          <input type="email" autoComplete="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
+          <Input type="email" autoComplete="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
         </label>
         <label>
           Password <span className="muted">(at least 8 characters)</span>
-          <input
+          <Input
             type="password"
             autoComplete="new-password"
             minLength={8}
@@ -143,9 +144,9 @@ export function RegisterPage() {
           />
         </label>
         <ErrorMessage error={error} />
-        <button className="btn-block" disabled={busy}>
+        <Button variant="solid" size="lg" className="w-full" disabled={busy}>
           {busy ? 'Creating…' : 'Create account'}
-        </button>
+        </Button>
       </form>
       <p className="muted small" style={{ marginTop: '1.25rem' }}>
         Already registered? <Link to={`/login?next=${encodeURIComponent(next)}`}>Sign in</Link>

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { PhoneReachability, ResetDemoButton } from '../../components/demoKit';
 import { useDemo } from '../../demoInfo';
+import { buttonClass } from '../../components/fui';
 
 const DEMOS = [
   {
@@ -43,7 +44,7 @@ export function DemoIndexPage() {
                 <li key={s}>{s}</li>
               ))}
             </ol>
-            <span className="btn">Start</span>
+            <span className={buttonClass({ variant: 'solid' })}>Start</span>
           </Link>
         ))}
       </div>
@@ -55,7 +56,7 @@ export function DemoIndexPage() {
             exports, sample passes and the email outbox.
           </p>
         </div>
-        <Link className="btn btn-secondary" to="/demo/full">
+        <Link className={buttonClass({ variant: 'subtle' })} to="/demo/full">
           Open detailed guide
         </Link>
       </div>

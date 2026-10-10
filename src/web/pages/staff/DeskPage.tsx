@@ -4,6 +4,7 @@ import { api, ApiError, qs } from '../../api';
 import { PassCard } from '../../components/PassCard';
 import { ErrorMessage, StatusBadge, useLoad } from '../../components/ui';
 import { newKey, POLICY_LABEL, stateLabel, type AccessOutcome, type EventRecord, type Participant, type Pass } from '../events/types';
+import { Button, buttonClass, Crumbs, Input } from '../../components/fui';
 
 interface Candidate {
   id: string;
@@ -78,9 +79,7 @@ export function DeskPage() {
 
   return (
     <>
-      <p className="small muted">
-        <Link to="/staff">Stations</Link> /
-      </p>
+      <Crumbs items={[{ label: 'Stations', to: "/staff" }]} current={'Exception desk'} />
       <h1>{e.name} — exception desk</h1>
       <p className="small muted">
         Policy: {POLICY_LABEL[e.verification_policy]} · photo ID {e.id_check_mode.toLowerCase().replace('_', ' ')} ·{' '}
@@ -103,8 +102,8 @@ export function DeskPage() {
           setQuery(q.trim());
         }}
       >
-        <input style={{ flex: 1, minWidth: 220 }} placeholder="Reference, name, email or phone" value={q} onChange={(evt) => setQ(evt.target.value)} autoFocus />
-        <button>Search</button>
+        <Input style={{ flex: 1, minWidth: 220 }} placeholder="Reference, name, email or phone" value={q} onChange={(evt) => setQ(evt.target.value)} autoFocus />
+        <Button variant="solid">Search</Button>
       </form>
       {results.data && results.data.participants.length === 0 && <p className="muted" style={{ marginTop: '0.75rem' }}>No matches.</p>}
       {results.data && results.data.participants.length > 0 && (
@@ -147,16 +146,16 @@ export function DeskPage() {
                   <td>{stateLabel(p, e.reentry_enabled)}</td>
                   <td>
                     <div className="row">
-                      <Link className="btn btn-secondary btn-sm" to={`/admin/events/${eventId}/participants/${p.id}`}>
+                      <Link className={buttonClass({ variant: 'subtle', size: 'sm' })} to={`/admin/events/${eventId}/participants/${p.id}`}>
                         Open
                       </Link>
                       {!p.checked_in_at || (e.reentry_enabled && p.current_access_state === 'OUTSIDE') ? (
-                        <button className="btn-sm" onClick={() => checkIn(p.id)}>
+                        <Button variant="solid" size="sm" onClick={() => checkIn(p.id)}>
                           {e.reentry_enabled ? 'Admit' : 'Check in'}
-                        </button>
+                        </Button>
                       ) : null}
                       {p.active_credential_id && (
-                        <Link className="btn btn-secondary btn-sm" to={`/admin/event-passes/${p.active_credential_id}/print`}>
+                        <Link className={buttonClass({ variant: 'subtle', size: 'sm' })} to={`/admin/event-passes/${p.active_credential_id}/print`}>
                           Reprint
                         </Link>
                       )}
@@ -182,13 +181,13 @@ export function DeskPage() {
           </div>
           <PassCard pass={created.pass} />
           <div className="actions no-print" style={{ justifyContent: 'center' }}>
-            <button className="btn-secondary" onClick={() => window.print()}>
+            <Button variant="subtle" onClick={() => window.print()}>
               Print pass
-            </button>
-            <button onClick={() => checkIn(created.participant.id)}>{e.reentry_enabled ? 'Admit now' : 'Check in now'}</button>
-            <button className="btn-secondary" onClick={() => { setCreated(null); setOutcome(null); }}>
+            </Button>
+            <Button variant="solid" onClick={() => checkIn(created.participant.id)}>{e.reentry_enabled ? 'Admit now' : 'Check in now'}</Button>
+            <Button variant="subtle" onClick={() => { setCreated(null); setOutcome(null); }}>
               Next walk-in
-            </button>
+            </Button>
           </div>
         </div>
       ) : (
@@ -196,19 +195,19 @@ export function DeskPage() {
           <div className="form-grid">
             <label>
               Name <span className="required">*</span>
-              <input value={walkIn.name} onChange={(evt) => setWalkIn({ ...walkIn, name: evt.target.value })} required />
+              <Input value={walkIn.name} onChange={(evt) => setWalkIn({ ...walkIn, name: evt.target.value })} required />
             </label>
             <label>
               Country
-              <input value={walkIn.country} onChange={(evt) => setWalkIn({ ...walkIn, country: evt.target.value })} />
+              <Input value={walkIn.country} onChange={(evt) => setWalkIn({ ...walkIn, country: evt.target.value })} />
             </label>
             <label>
               Email
-              <input type="email" value={walkIn.email} onChange={(evt) => setWalkIn({ ...walkIn, email: evt.target.value })} />
+              <Input type="email" value={walkIn.email} onChange={(evt) => setWalkIn({ ...walkIn, email: evt.target.value })} />
             </label>
             <label>
               Phone
-              <input type="tel" value={walkIn.phone} onChange={(evt) => setWalkIn({ ...walkIn, phone: evt.target.value })} />
+              <Input type="tel" value={walkIn.phone} onChange={(evt) => setWalkIn({ ...walkIn, phone: evt.target.value })} />
             </label>
           </div>
           <label className="check">
@@ -235,7 +234,7 @@ export function DeskPage() {
                       <td className="mono">{c.registration_reference}</td>
                       <td className="small">{c.email ?? c.phone}</td>
                       <td>
-                        <Link className="btn btn-secondary btn-sm" to={`/admin/events/${eventId}/participants/${c.id}`}>
+                        <Link className={buttonClass({ variant: 'subtle', size: 'sm' })} to={`/admin/events/${eventId}/participants/${c.id}`}>
                           Use this
                         </Link>
                       </td>
@@ -244,16 +243,16 @@ export function DeskPage() {
                 </tbody>
               </table>
               <div className="actions">
-                <button type="button" className="btn-secondary" onClick={() => setCandidates(null)}>
+                <Button variant="subtle" type="button" onClick={() => setCandidates(null)}>
                   Cancel
-                </button>
-                <button type="button" disabled={busy} onClick={() => register(null, true)}>
+                </Button>
+                <Button variant="solid" type="button" disabled={busy} onClick={() => register(null, true)}>
                   None of these — create new
-                </button>
+                </Button>
               </div>
             </div>
           )}
-          {!candidates && <button disabled={busy}>{busy ? 'Checking…' : 'Search & register'}</button>}
+          {!candidates && <Button variant="solid" disabled={busy}>{busy ? 'Checking…' : 'Search & register'}</Button>}
         </form>
       )}
     </>

@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, ROLE_LABEL, type Role, type User } from '../../api';
 import { useAuth } from '../../auth';
-import { ErrorMessage, ReasonDialog, StatusBadge, useLoad } from '../../components/ui';
+import { ErrorMessage, ReasonDialog, StatusBadge, TableWrap, useLoad } from '../../components/ui';
 import { formatDate, formatTime } from '../../format';
+import { Button, Crumbs, Select } from '../../components/fui';
 
 interface Row {
   id: string;
@@ -30,9 +31,7 @@ export function VolunteerDetailPage() {
 
   return (
     <>
-      <p className="small muted">
-        <Link to="/admin/volunteers">People</Link> /
-      </p>
+      <Crumbs items={[{ label: 'People', to: "/admin/volunteers" }]} current={v.name} />
       <h1>
         {v.name} <StatusBadge status={v.status} />
       </h1>
@@ -43,7 +42,7 @@ export function VolunteerDetailPage() {
         <dd>{v.email}</dd>
         <dt>Role</dt>
         <dd>
-          <select
+          <Select
             value={v.role}
             disabled={isMe}
             onChange={(e) => setChange({ role: e.target.value as Role })}
@@ -54,19 +53,19 @@ export function VolunteerDetailPage() {
                 {label}
               </option>
             ))}
-          </select>
+          </Select>
         </dd>
       </dl>
       {!isMe && (
         <div className="row" style={{ marginTop: '1rem' }}>
           {v.status === 'ACTIVE' ? (
-            <button className="btn-secondary" onClick={() => setChange({ status: 'INACTIVE' })}>
+            <Button variant="subtle" onClick={() => setChange({ status: 'INACTIVE' })}>
               Deactivate
-            </button>
+            </Button>
           ) : (
-            <button className="btn-secondary" onClick={() => setChange({ status: 'ACTIVE' })}>
+            <Button variant="subtle" onClick={() => setChange({ status: 'ACTIVE' })}>
               Reactivate
-            </button>
+            </Button>
           )}
         </div>
       )}
@@ -76,7 +75,7 @@ export function VolunteerDetailPage() {
         {data.attendance.length === 0 ? (
           <p className="muted">No attendance recorded.</p>
         ) : (
-          <div className="table-wrap">
+          <TableWrap>
             <table>
               <thead>
                 <tr>
@@ -107,7 +106,7 @@ export function VolunteerDetailPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableWrap>
         )}
       </div>
 

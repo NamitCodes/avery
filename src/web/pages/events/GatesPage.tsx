@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api';
-import { ErrorMessage, StatusBadge, useLoad } from '../../components/ui';
+import { ErrorMessage, StatusBadge, TableWrap, useLoad } from '../../components/ui';
 import { useEventContext } from './EventLayout';
+import { Button, buttonClass, Input, Select } from '../../components/fui';
 
 interface Gate {
   id: string;
@@ -45,7 +46,7 @@ export function GatesPage() {
       </p>
       <ErrorMessage error={error ?? actionError} />
       {data && data.gates.length > 0 && (
-        <div className="table-wrap">
+        <TableWrap>
           <table>
             <thead>
               <tr>
@@ -64,14 +65,14 @@ export function GatesPage() {
                     <div className="small muted">{g.location_description}</div>
                   </td>
                   <td>
-                    <select
+                    <Select
                       value={g.mode}
                       style={{ width: 'auto', padding: '0.2rem 0.4rem' }}
                       onChange={(ev) => run(() => api.patch(`/admin/event-gates/${g.id}`, { mode: ev.target.value }))}
                     >
                       <option>ENTRY</option>
                       <option>EXIT</option>
-                    </select>
+                    </Select>
                   </td>
                   <td>
                     <StatusBadge status={g.status} />
@@ -80,9 +81,9 @@ export function GatesPage() {
                     {g.operators.map((o) => (
                       <div key={o.id}>
                         {o.name}{' '}
-                        <button className="btn-link small" onClick={() => run(() => api.post(`/admin/event-gates/${g.id}/operators`, { email: o.email, remove: true }))}>
+                        <Button variant="ghost" className="small" onClick={() => run(() => api.post(`/admin/event-gates/${g.id}/operators`, { email: o.email, remove: true }))}>
                           remove
-                        </button>
+                        </Button>
                       </div>
                     ))}
                     <form
@@ -94,33 +95,33 @@ export function GatesPage() {
                         setAssign({ ...assign, [g.id]: '' });
                       }}
                     >
-                      <input
+                      <Input
                         placeholder="operator email"
                         value={assign[g.id] ?? ''}
                         onChange={(ev) => setAssign({ ...assign, [g.id]: ev.target.value })}
                         style={{ padding: '0.25rem 0.4rem', minWidth: 160 }}
                       />
-                      <button className="btn-secondary btn-sm">Assign</button>
+                      <Button variant="subtle" size="sm">Assign</Button>
                     </form>
                   </td>
                   <td>
                     <div className="row">
-                      <Link className="btn btn-secondary btn-sm" to={`/staff/gate/${g.id}`}>
+                      <Link className={buttonClass({ variant: 'subtle', size: 'sm' })} to={`/staff/gate/${g.id}`}>
                         Open scanner
                       </Link>
-                      <button
-                        className="btn-secondary btn-sm"
+                      <Button variant="subtle" size="sm"
+                       
                         onClick={() => run(() => api.patch(`/admin/event-gates/${g.id}`, { status: g.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE' }))}
                       >
                         {g.status === 'ACTIVE' ? 'Deactivate' : 'Activate'}
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       )}
       <div className="section" style={{ maxWidth: 560 }}>
         <h2>Add gate</h2>
@@ -128,21 +129,21 @@ export function GatesPage() {
           <div className="form-grid">
             <label>
               Name
-              <input value={form.name} onChange={(ev) => setForm({ ...form, name: ev.target.value })} required placeholder="e.g. Participant entry" />
+              <Input value={form.name} onChange={(ev) => setForm({ ...form, name: ev.target.value })} required placeholder="e.g. Participant entry" />
             </label>
             <label>
               Mode
-              <select value={form.mode} onChange={(ev) => setForm({ ...form, mode: ev.target.value })}>
+              <Select value={form.mode} onChange={(ev) => setForm({ ...form, mode: ev.target.value })}>
                 <option>ENTRY</option>
                 {e.reentry_enabled && <option>EXIT</option>}
-              </select>
+              </Select>
             </label>
           </div>
           <label>
             Location <span className="muted">(optional)</span>
-            <input value={form.location_description} onChange={(ev) => setForm({ ...form, location_description: ev.target.value })} />
+            <Input value={form.location_description} onChange={(ev) => setForm({ ...form, location_description: ev.target.value })} />
           </label>
-          <button>Add gate</button>
+          <Button variant="solid">Add gate</Button>
         </form>
       </div>
     </>

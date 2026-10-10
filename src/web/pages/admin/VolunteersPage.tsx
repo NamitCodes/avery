@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api, qs, ROLE_LABEL, type Role } from '../../api';
-import { ErrorMessage, StatusBadge, useLoad } from '../../components/ui';
+import { ErrorMessage, StatusBadge, TableWrap, useLoad } from '../../components/ui';
 import { formatDateTime } from '../../format';
+import { Input, Select } from '../../components/fui';
 
 interface Row {
   id: string;
@@ -26,23 +27,23 @@ export function VolunteersPage() {
       <div className="filters">
         <label>
           Search
-          <input placeholder="Name, email or ID" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Input placeholder="Name, email or ID" value={q} onChange={(e) => setQ(e.target.value)} />
         </label>
         <label>
           Role
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
+          <Select value={role} onChange={(e) => setRole(e.target.value)}>
             <option value="">All roles</option>
             {Object.entries(ROLE_LABEL).map(([k, v]) => (
               <option key={k} value={k}>
                 {v}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
       </div>
       <ErrorMessage error={error} />
       {data && (
-        <div className="table-wrap">
+        <TableWrap>
           <table>
             <thead>
               <tr>
@@ -72,7 +73,7 @@ export function VolunteersPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       )}
     </>
   );

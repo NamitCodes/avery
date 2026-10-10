@@ -1,102 +1,49 @@
-import { Link, Navigate, NavLink, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { lazy, Suspense } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
 import { DESK_STAFF, EVENT_MANAGERS, GATE_STAFF } from './api';
-import { RequireAuth, useAuth } from './auth';
-import { AuditPage } from './pages/admin/AuditPage';
-import { LocationDetailPage } from './pages/admin/LocationDetailPage';
-import { LocationsPage } from './pages/admin/LocationsPage';
-import { QrPrintPage } from './pages/admin/QrPrintPage';
-import { SessionDetailPage } from './pages/admin/SessionDetailPage';
-import { SessionFormPage } from './pages/admin/SessionFormPage';
-import { SessionsPage } from './pages/admin/SessionsPage';
-import { VolunteerDetailPage } from './pages/admin/VolunteerDetailPage';
-import { VolunteersPage } from './pages/admin/VolunteersPage';
-import { EventFormPage } from './pages/events/EventFormPage';
-import { EventLayout } from './pages/events/EventLayout';
-import { EventOverviewPage } from './pages/events/EventOverviewPage';
-import { EventsPage } from './pages/events/EventsPage';
-import { AccessLogPage } from './pages/events/AccessLogPage';
-import { DeliveriesPage } from './pages/events/DeliveriesPage';
-import { GatesPage } from './pages/events/GatesPage';
-import { ImportPage } from './pages/events/ImportPage';
-import { ParticipantDetailPage } from './pages/events/ParticipantDetailPage';
-import { ParticipantsPage } from './pages/events/ParticipantsPage';
-import { PassPrintPage } from './pages/events/PassPrintPage';
-import { DeskPage } from './pages/staff/DeskPage';
+import { AppShell, PlainShell } from './components/AppShell';
+import { RequireAuth } from './auth';
 import { GateScannerPage } from './pages/staff/GateScannerPage';
-import { StationsPage } from './pages/staff/StationsPage';
 import { PublicPassPage } from './pages/public/PublicPassPage';
 import { PublicRegistrationPage } from './pages/public/PublicRegistrationPage';
 import { CheckInPage } from './pages/CheckInPage';
-import { DemoPage } from './pages/DemoPage';
-import { DemoIndexPage } from './pages/demo/DemoIndexPage';
-import { DemoOpenEventPage } from './pages/demo/DemoOpenEventPage';
 import { DemoPhonePage, DemoSignInPage } from './pages/demo/DemoPhonePages';
-import { DemoSummitPage } from './pages/demo/DemoSummitPage';
-import { DemoVolunteerPage } from './pages/demo/DemoVolunteerPage';
-import { useDemo } from './demoInfo';
 import { HomePage } from './pages/HomePage';
 import { LoginPage, RegisterPage } from './pages/LoginPage';
 import { MyAttendancePage } from './pages/MyAttendancePage';
 
-function Layout({ narrow = false }: { narrow?: boolean }) {
-  const { user, logout } = useAuth();
-  const navigate = useNavigate();
-  const is = (roles: string[]) => !!user && roles.includes(user.role);
-  const demo = useDemo();
-  return (
-    <>
-      {demo && (
-        <div className="demo-banner no-print">
-          Demo mode — sample data only. <Link to="/demo">Demos</Link>
-          {user && (
-            <span className="muted">
-              {' '}
-              · signed in as {user.name}
-            </span>
-          )}
-        </div>
-      )}
-      <header className="topbar">
-        <Link to="/" className="brand">
-          RSSB
-        </Link>
-        <nav>
-          {demo && <NavLink to="/demo">Demos</NavLink>}
-          {user && <NavLink to="/me/attendance">My attendance</NavLink>}
-          {user?.role === 'ADMIN' && (
-            <>
-              <NavLink to="/admin/sessions">Sessions</NavLink>
-              <NavLink to="/admin/venues">Venues</NavLink>
-              <NavLink to="/admin/volunteers">People</NavLink>
-              <NavLink to="/admin/audit">Audit</NavLink>
-            </>
-          )}
-          {is(DESK_STAFF) && <NavLink to="/admin/events">Events</NavLink>}
-          {is(GATE_STAFF) && <NavLink to="/staff">Stations</NavLink>}
-          {user ? (
-            <button
-              className="btn-link"
-              onClick={async () => {
-                await logout();
-                navigate('/login');
-              }}
-            >
-              Sign out
-            </button>
-          ) : (
-            <NavLink to="/login">Sign in</NavLink>
-          )}
-        </nav>
-      </header>
-      <main className={narrow ? 'narrow' : undefined}>
-        <Outlet />
-      </main>
-    </>
-  );
-}
+// Admin, event-management and demo screens load on demand; phone-facing pages stay in the main bundle.
+const AuditPage = lazy(() => import('./pages/admin/AuditPage').then((m) => ({ default: m.AuditPage })));
+const LocationDetailPage = lazy(() => import('./pages/admin/LocationDetailPage').then((m) => ({ default: m.LocationDetailPage })));
+const LocationsPage = lazy(() => import('./pages/admin/LocationsPage').then((m) => ({ default: m.LocationsPage })));
+const QrPrintPage = lazy(() => import('./pages/admin/QrPrintPage').then((m) => ({ default: m.QrPrintPage })));
+const SessionDetailPage = lazy(() => import('./pages/admin/SessionDetailPage').then((m) => ({ default: m.SessionDetailPage })));
+const SessionFormPage = lazy(() => import('./pages/admin/SessionFormPage').then((m) => ({ default: m.SessionFormPage })));
+const SessionsPage = lazy(() => import('./pages/admin/SessionsPage').then((m) => ({ default: m.SessionsPage })));
+const VolunteerDetailPage = lazy(() => import('./pages/admin/VolunteerDetailPage').then((m) => ({ default: m.VolunteerDetailPage })));
+const VolunteersPage = lazy(() => import('./pages/admin/VolunteersPage').then((m) => ({ default: m.VolunteersPage })));
+const EventFormPage = lazy(() => import('./pages/events/EventFormPage').then((m) => ({ default: m.EventFormPage })));
+const EventLayout = lazy(() => import('./pages/events/EventLayout').then((m) => ({ default: m.EventLayout })));
+const EventOverviewPage = lazy(() => import('./pages/events/EventOverviewPage').then((m) => ({ default: m.EventOverviewPage })));
+const EventsPage = lazy(() => import('./pages/events/EventsPage').then((m) => ({ default: m.EventsPage })));
+const AccessLogPage = lazy(() => import('./pages/events/AccessLogPage').then((m) => ({ default: m.AccessLogPage })));
+const DeliveriesPage = lazy(() => import('./pages/events/DeliveriesPage').then((m) => ({ default: m.DeliveriesPage })));
+const GatesPage = lazy(() => import('./pages/events/GatesPage').then((m) => ({ default: m.GatesPage })));
+const ImportPage = lazy(() => import('./pages/events/ImportPage').then((m) => ({ default: m.ImportPage })));
+const ParticipantDetailPage = lazy(() => import('./pages/events/ParticipantDetailPage').then((m) => ({ default: m.ParticipantDetailPage })));
+const ParticipantsPage = lazy(() => import('./pages/events/ParticipantsPage').then((m) => ({ default: m.ParticipantsPage })));
+const PassPrintPage = lazy(() => import('./pages/events/PassPrintPage').then((m) => ({ default: m.PassPrintPage })));
+const DeskPage = lazy(() => import('./pages/staff/DeskPage').then((m) => ({ default: m.DeskPage })));
+const StationsPage = lazy(() => import('./pages/staff/StationsPage').then((m) => ({ default: m.StationsPage })));
+const DemoPage = lazy(() => import('./pages/DemoPage').then((m) => ({ default: m.DemoPage })));
+const DemoIndexPage = lazy(() => import('./pages/demo/DemoIndexPage').then((m) => ({ default: m.DemoIndexPage })));
+const DemoOpenEventPage = lazy(() => import('./pages/demo/DemoOpenEventPage').then((m) => ({ default: m.DemoOpenEventPage })));
+const DemoSummitPage = lazy(() => import('./pages/demo/DemoSummitPage').then((m) => ({ default: m.DemoSummitPage })));
+const DemoVolunteerPage = lazy(() => import('./pages/demo/DemoVolunteerPage').then((m) => ({ default: m.DemoVolunteerPage })));
 
 export function App() {
   return (
+    <Suspense fallback={<p className="muted center" style={{ padding: '3rem' }}>Loading…</p>}>
     <Routes>
       {/* Full-screen / print views without the app chrome */}
       <Route path="/admin/qr/:qrId/print" element={<RequireAuth roles={['ADMIN']}><QrPrintPage /></RequireAuth>} />
@@ -104,7 +51,7 @@ export function App() {
       <Route path="/staff/gate/:gateId" element={<RequireAuth roles={GATE_STAFF}><GateScannerPage /></RequireAuth>} />
       <Route path="/pass/:token" element={<PublicPassPage />} />
 
-      <Route element={<Layout narrow />}>
+      <Route element={<PlainShell />}>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/check-in/v/:venueId" element={<RequireAuth><CheckInPage /></RequireAuth>} />
@@ -113,7 +60,7 @@ export function App() {
         <Route path="/demo/phone" element={<RequireAuth><DemoPhonePage /></RequireAuth>} />
       </Route>
 
-      <Route element={<Layout />}>
+      <Route element={<AppShell />}>
         <Route path="/" element={<HomePage />} />
         <Route path="/demo" element={<DemoIndexPage />} />
         <Route path="/demo/full" element={<DemoPage />} />
@@ -154,5 +101,6 @@ export function App() {
         <Route path="*" element={<p className="muted">Page not found.</p>} />
       </Route>
     </Routes>
+    </Suspense>
   );
 }

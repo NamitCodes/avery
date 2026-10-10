@@ -40,7 +40,9 @@ export function createApp(ctx: AppContext) {
         directives: {
           defaultSrc: ["'self'"],
           imgSrc: ["'self'", 'data:'],
-          styleSrc: ["'self'", "'unsafe-inline'"],
+          // Frappe UI's theme loads the Inter font stylesheet from Google Fonts.
+          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+          fontSrc: ["'self'", 'https://fonts.gstatic.com', 'data:'],
           // Local HTTP development must not be upgraded to HTTPS.
           upgradeInsecureRequests: ctx.config.nodeEnv === 'production' ? [] : null,
         },

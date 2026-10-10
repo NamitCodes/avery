@@ -4,6 +4,7 @@ import { api, type Location, type QrCode } from '../../api';
 import { ErrorMessage, ReasonDialog, StatusBadge, useLoad } from '../../components/ui';
 import { formatDateTime } from '../../format';
 import { TIMEZONES } from './LocationsPage';
+import { Button, buttonClass, Crumbs, Input, Select } from '../../components/fui';
 
 export function LocationDetailPage() {
   const { id = '' } = useParams();
@@ -38,9 +39,7 @@ export function LocationDetailPage() {
 
   return (
     <>
-      <p className="small muted">
-        <Link to="/admin/venues">Venues</Link> /
-      </p>
+      <Crumbs items={[{ label: 'Venues', to: "/admin/venues" }]} current={location.name} />
       <h1>
         {location.name} <StatusBadge status={location.status} />
       </h1>
@@ -60,24 +59,24 @@ export function LocationDetailPage() {
               </div>
             </div>
             <div className="row" style={{ marginTop: '1rem' }}>
-              <Link className="btn" to={`/admin/qr/${active.id}/print`}>
+              <Link className={buttonClass({ variant: 'solid' })} to={`/admin/qr/${active.id}/print`}>
                 Print
               </Link>
-              <a className="btn btn-secondary" href={`/api/admin/qr-codes/${active.id}/image?download=1`}>
+              <a className={buttonClass({ variant: 'subtle' })} href={`/api/admin/qr-codes/${active.id}/image?download=1`}>
                 Download PNG
               </a>
-              <button className="btn-secondary" onClick={() => setDialog('replace')}>
+              <Button variant="subtle" onClick={() => setDialog('replace')}>
                 Replace
-              </button>
-              <button className="btn-danger" onClick={() => setDialog('revoke')}>
+              </Button>
+              <Button variant="solid" theme="red" onClick={() => setDialog('revoke')}>
                 Revoke
-              </button>
+              </Button>
             </div>
           </>
         ) : (
           <>
             <p className="muted">No active QR code. Volunteers cannot check in at this venue until you generate one.</p>
-            <button onClick={() => setDialog('replace')}>Generate QR code</button>
+            <Button variant="solid" onClick={() => setDialog('replace')}>Generate QR code</Button>
           </>
         )}
       </div>
@@ -87,30 +86,30 @@ export function LocationDetailPage() {
         <form onSubmit={save}>
           <label>
             Name
-            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
+            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required />
           </label>
           <label>
             Address
-            <input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
+            <Input value={form.address} onChange={(e) => setForm({ ...form, address: e.target.value })} />
           </label>
           <label>
             Time zone
-            <select value={form.timezone} onChange={(e) => setForm({ ...form, timezone: e.target.value })}>
+            <Select value={form.timezone} onChange={(e) => setForm({ ...form, timezone: e.target.value })}>
               {TIMEZONES.map((tz) => (
                 <option key={tz}>{tz}</option>
               ))}
-            </select>
+            </Select>
           </label>
           <label>
             Status
-            <select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
+            <Select value={form.status} onChange={(e) => setForm({ ...form, status: e.target.value })}>
               <option value="ACTIVE">Active</option>
               <option value="INACTIVE">Inactive (blocks check-ins)</option>
-            </select>
+            </Select>
           </label>
           <ErrorMessage error={error} />
           {saved && <div className="alert alert-ok">Saved.</div>}
-          <button>Save</button>
+          <Button variant="solid">Save</Button>
         </form>
       </div>
 

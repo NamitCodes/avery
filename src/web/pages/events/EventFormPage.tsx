@@ -6,6 +6,7 @@ import { toLocalInput } from '../../format';
 import { TIMEZONES } from '../admin/LocationsPage';
 import type { EventContext } from './EventLayout';
 import { POLICY_LABEL, type EventRecord } from './types';
+import { Button, Input, Select, Textarea } from '../../components/fui';
 
 const NEXT_STATUS: Record<string, { status: string; label: string }[]> = {
   DRAFT: [{ status: 'ACTIVE', label: 'Activate (open registration & scanning)' }],
@@ -88,14 +89,14 @@ export function EventFormPage() {
             </div>
             <div className="row">
               {NEXT_STATUS[existing.status].map((s) => (
-                <button key={s.status} className="btn-secondary" onClick={() => setStatusChange(s.status)}>
+                <Button variant="subtle" key={s.status} onClick={() => setStatusChange(s.status)}>
                   {s.label}
-                </button>
+                </Button>
               ))}
               {existing.status === 'ARCHIVED' && !existing.redacted_at && (
-                <button className="btn-danger" onClick={() => setRedact(true)}>
+                <Button variant="solid" theme="red" onClick={() => setRedact(true)}>
                   Redact personal data
-                </button>
+                </Button>
               )}
             </div>
           </div>
@@ -110,36 +111,36 @@ export function EventFormPage() {
         <fieldset disabled={locked} style={{ border: 0, padding: 0, margin: 0 }}>
           <label>
             Event name
-            <input value={f.name} onChange={text('name')} required />
+            <Input value={f.name} onChange={text('name')} required />
           </label>
           <label>
             Description
-            <textarea rows={2} value={f.description} onChange={text('description')} />
+            <Textarea rows={2} value={f.description} onChange={text('description')} />
           </label>
           <div className="form-grid">
             <label>
               Venue
-              <input value={f.venue_text} onChange={text('venue_text')} />
+              <Input value={f.venue_text} onChange={text('venue_text')} />
             </label>
             <label>
               Time zone
-              <select value={f.timezone} onChange={text('timezone')}>
+              <Select value={f.timezone} onChange={text('timezone')}>
                 {TIMEZONES.map((tz) => (
                   <option key={tz}>{tz}</option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Starts
-              <input type="datetime-local" value={f.starts_at} onChange={text('starts_at')} required />
+              <Input type="datetime-local" value={f.starts_at} onChange={text('starts_at')} required />
             </label>
             <label>
               Ends
-              <input type="datetime-local" value={f.ends_at} onChange={text('ends_at')} required />
+              <Input type="datetime-local" value={f.ends_at} onChange={text('ends_at')} required />
             </label>
             <label>
               Capacity <span className="muted">(optional)</span>
-              <input type="number" min={1} value={f.capacity} onChange={text('capacity')} />
+              <Input type="number" min={1} value={f.capacity} onChange={text('capacity')} />
             </label>
           </div>
 
@@ -169,17 +170,17 @@ export function EventFormPage() {
           <div className="form-grid">
             <label>
               Verification policy
-              <select value={f.verification_policy} onChange={text('verification_policy')}>
+              <Select value={f.verification_policy} onChange={text('verification_policy')}>
                 {Object.entries(POLICY_LABEL).map(([k, v]) => (
                   <option key={k} value={k}>
                     {v}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
             <label>
               Photo ID checks
-              <select
+              <Select
                 value={f.verification_policy === 'IN_PERSON_ID_CHECK' ? 'MANDATORY' : f.id_check_mode}
                 disabled={f.verification_policy === 'IN_PERSON_ID_CHECK'}
                 onChange={text('id_check_mode')}
@@ -187,16 +188,16 @@ export function EventFormPage() {
                 <option value="NOT_USED">Not used</option>
                 <option value="CONDITIONAL">Conditional (staff discretion)</option>
                 <option value="MANDATORY">Mandatory</option>
-              </select>
+              </Select>
             </label>
             <label>
               Contact details required
-              <select value={f.contact_requirement} onChange={text('contact_requirement')}>
+              <Select value={f.contact_requirement} onChange={text('contact_requirement')}>
                 <option value="NONE">None (name only)</option>
                 <option value="EMAIL">Email</option>
                 <option value="PHONE">Phone</option>
                 <option value="EMAIL_OR_PHONE">Email or phone</option>
-              </select>
+              </Select>
             </label>
           </div>
           <p className="small muted">
@@ -205,12 +206,12 @@ export function EventFormPage() {
           </p>
           <label>
             Instructions printed on passes
-            <textarea rows={2} value={f.instructions} onChange={text('instructions')} />
+            <Textarea rows={2} value={f.instructions} onChange={text('instructions')} />
           </label>
           <ErrorMessage error={error} />
           {saved && <div className="alert alert-ok">Saved.</div>}
           <div className="actions">
-            <button disabled={busy}>{existing ? 'Save settings' : 'Create event'}</button>
+            <Button variant="solid" disabled={busy}>{existing ? 'Save settings' : 'Create event'}</Button>
           </div>
         </fieldset>
       </form>

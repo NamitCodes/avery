@@ -1,6 +1,6 @@
 import { api } from '../api';
 import { useAuth } from '../auth';
-import { ErrorMessage, useLoad } from '../components/ui';
+import { ErrorMessage, TableWrap, useLoad } from '../components/ui';
 import { formatDate, formatRange, formatTime } from '../format';
 
 interface Row {
@@ -27,7 +27,7 @@ export function MyAttendancePage() {
       {loading && <p className="muted">Loading…</p>}
       {data && data.attendance.length === 0 && <p className="muted">You haven’t checked in to any activities yet.</p>}
       {data && data.attendance.length > 0 && (
-        <div className="table-wrap">
+        <TableWrap>
           <table>
             <thead>
               <tr>
@@ -54,7 +54,7 @@ export function MyAttendancePage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       )}
     </>
   );

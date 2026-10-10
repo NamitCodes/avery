@@ -6,7 +6,7 @@ One application and one PostgreSQL database supporting the three workflows in [U
 2. **International event access** — organiser-supplied participant lists are imported, printable QR passes are issued and emailed, and entry, exit and re-entry are tracked at gates (§15–25).
 3. **Open events** — online advance registration plus walk-ins at the venue, with configurable identity assurance and an auditable record for every admitted attendee (§26–27).
 
-Stack: Node 20, TypeScript, Express 5, PostgreSQL (`pg`), React 18 + Vite, Vitest + Supertest.
+Stack: Node 20, TypeScript, Express 5, PostgreSQL (`pg`), React 19 + Vite, Vitest + Supertest, Playwright. UI: [Frappe UI](https://ui.frappe.io) via its React port [`@rtcamp/frappe-ui-react`](https://github.com/rtCamp/frappe-ui-react) (Tailwind v4 + Frappe theme); thin adapters live in `src/web/components/fui.tsx`.
 
 ## Quick start (development)
 

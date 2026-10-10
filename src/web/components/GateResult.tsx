@@ -1,6 +1,7 @@
 import { ApiError } from '../api';
 import { formatTime } from '../format';
 import type { AccessOutcome } from '../pages/events/types';
+import { Button } from './fui';
 
 export function errorOutcome(e: ApiError): AccessOutcome {
   return {
@@ -50,12 +51,12 @@ export function ResultCard({
       {o.replay && <div className="msg small">(already processed — this is the original result)</div>}
       {o.code === 'ID_CHECK_REQUIRED' && o.participant && (
         <div className="row" style={{ justifyContent: 'center', marginTop: '1rem' }}>
-          <button className="btn-secondary" onClick={() => onIdCheck('CHECKED')}>
+          <Button variant="subtle" onClick={() => onIdCheck('CHECKED')}>
             ID matches — admit
-          </button>
-          <button className="btn-secondary" onClick={() => onIdCheck('FAILED')}>
+          </Button>
+          <Button variant="subtle" onClick={() => onIdCheck('FAILED')}>
             ID does not match
-          </button>
+          </Button>
         </div>
       )}
     </div>

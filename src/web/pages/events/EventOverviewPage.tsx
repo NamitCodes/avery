@@ -44,7 +44,7 @@ export function EventOverviewPage() {
       <ErrorMessage error={occ.error} />
       {o && (
         <>
-          <div className="grid">
+          <div className="card-grid">
             {e.reentry_enabled && <Stat label={`Inside now${e.capacity ? ` / ${e.capacity}` : ''}`} value={o.inside} />}
             <Stat label="Registered" value={o.total_participants} />
             <Stat label="Checked in (unique)" value={o.checked_in_unique} />

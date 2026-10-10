@@ -5,6 +5,7 @@ import { PassCard } from '../../components/PassCard';
 import { ErrorMessage, useLoad } from '../../components/ui';
 import { formatRange } from '../../format';
 import type { Pass } from '../events/types';
+import { Button, Input } from '../../components/fui';
 
 interface PublicEvent {
   event: {
@@ -123,13 +124,13 @@ export function PublicRegistrationPage() {
               {' '}Your pass will be emailed after you confirm. This confirms you can access the email address; it is not an identity check.
             </p>
             <div className="row">
-              <input inputMode="numeric" maxLength={6} placeholder="123456" value={code} onChange={(evt) => setCode(evt.target.value)} style={{ width: 140 }} />
-              <button disabled={busy || code.length !== 6} onClick={() => verify('confirm')}>
+              <Input inputMode="numeric" maxLength={6} placeholder="123456" value={code} onChange={(evt) => setCode(evt.target.value)} style={{ width: 140 }} />
+              <Button variant="solid" disabled={busy || code.length !== 6} onClick={() => verify('confirm')}>
                 Confirm
-              </button>
-              <button className="btn-link" disabled={busy} onClick={() => verify('start')}>
+              </Button>
+              <Button variant="ghost" disabled={busy} onClick={() => verify('start')}>
                 Resend code
-              </button>
+              </Button>
             </div>
             <ErrorMessage error={error} />
           </div>
@@ -140,7 +141,7 @@ export function PublicRegistrationPage() {
             <p>Print this pass and bring it to the event. {form.email ? 'We have also emailed it to you.' : ''}</p>
             <PassCard pass={result.pass} />
             <div className="actions no-print" style={{ justifyContent: 'center' }}>
-              <button onClick={() => window.print()}>Print pass</button>
+              <Button variant="solid" onClick={() => window.print()}>Print pass</Button>
             </div>
           </>
         )}
@@ -158,30 +159,30 @@ export function PublicRegistrationPage() {
         <form onSubmit={submit}>
           <label>
             Full name <span className="required">*</span>
-            <input autoComplete="name" value={form.name} onChange={(evt) => setForm({ ...form, name: evt.target.value })} required />
+            <Input autoComplete="name" value={form.name} onChange={(evt) => setForm({ ...form, name: evt.target.value })} required />
           </label>
           {e.contact_requirement !== 'PHONE' && (
             <label>
               Email {needEmail && <span className="required">*</span>}
-              <input type="email" autoComplete="email" value={form.email} onChange={(evt) => setForm({ ...form, email: evt.target.value })} required={needEmail} />
+              <Input type="email" autoComplete="email" value={form.email} onChange={(evt) => setForm({ ...form, email: evt.target.value })} required={needEmail} />
             </label>
           )}
           {e.contact_requirement !== 'EMAIL' && (
             <label>
               Phone {needPhone && <span className="required">*</span>}
-              <input type="tel" autoComplete="tel" value={form.phone} onChange={(evt) => setForm({ ...form, phone: evt.target.value })} required={needPhone} />
+              <Input type="tel" autoComplete="tel" value={form.phone} onChange={(evt) => setForm({ ...form, phone: evt.target.value })} required={needPhone} />
             </label>
           )}
           {e.contact_requirement === 'EMAIL_OR_PHONE' && <p className="small muted">Please give an email address or a phone number.</p>}
           <label>
             Country <span className="muted">(optional)</span>
-            <input autoComplete="country-name" value={form.country} onChange={(evt) => setForm({ ...form, country: evt.target.value })} />
+            <Input autoComplete="country-name" value={form.country} onChange={(evt) => setForm({ ...form, country: evt.target.value })} />
           </label>
           <p className="small muted">We only use these details to manage your registration and admission for this event.</p>
           <ErrorMessage error={error} />
-          <button className="btn-block" disabled={busy}>
+          <Button variant="solid" size="lg" className="w-full" disabled={busy}>
             {busy ? 'Registering…' : 'Register'}
-          </button>
+          </Button>
         </form>
       )}
     </>

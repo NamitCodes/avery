@@ -5,6 +5,7 @@ import { BigQr, DemoPageShell, DemoStep, qrSrc, usePolling, usePresenter } from 
 import { ErrorMessage } from '../../components/ui';
 import { formatTime } from '../../format';
 import { newKey, SOURCE_LABEL, type AccessOutcome, type Participant, type Pass } from '../events/types';
+import { Button, Input } from '../../components/fui';
 
 /** Phone registers online (no account); laptop checks people in, and registers a walk-in without a phone. */
 export function DemoOpenEventPage() {
@@ -118,9 +119,9 @@ export function DemoOpenEventPage() {
                   {p.checked_in_at ? (
                     <span>Checked in {formatTime(p.checked_in_at)}</span>
                   ) : (
-                    <button className="btn-sm" onClick={() => checkIn(p)}>
+                    <Button variant="solid" size="sm" onClick={() => checkIn(p)}>
                       Check in
-                    </button>
+                    </Button>
                   )}
                 </td>
               </tr>
@@ -132,15 +133,15 @@ export function DemoOpenEventPage() {
 
       <DemoStep n={4} who="Laptop" title="Someone walks in without a phone">
         <form className="row" onSubmit={registerWalkIn}>
-          <input placeholder="Visitor’s name, e.g. Mdm Wong" value={walkIn} onChange={(e) => setWalkIn(e.target.value)} style={{ maxWidth: 300 }} />
-          <button disabled={!walkIn.trim()}>Register walk-in</button>
+          <Input placeholder="Visitor’s name, e.g. Mdm Wong" value={walkIn} onChange={(e) => setWalkIn(e.target.value)} style={{ maxWidth: 300 }} />
+          <Button variant="solid" disabled={!walkIn.trim()}>Register walk-in</Button>
         </form>
         {walkInPass && (
           <div className="demo-split" style={{ marginTop: '1rem' }}>
             <PassCard pass={walkInPass.pass} />
             <div>
               <p>The desk prints this paper pass. No email or phone was needed.</p>
-              <button onClick={() => checkIn(walkInPass.participant)}>Check {walkInPass.participant.name} in</button>
+              <Button variant="solid" onClick={() => checkIn(walkInPass.participant)}>Check {walkInPass.participant.name} in</Button>
             </div>
           </div>
         )}

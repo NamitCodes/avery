@@ -8,6 +8,7 @@ import { PassCard } from '../../components/PassCard';
 import { ErrorMessage, useLoad } from '../../components/ui';
 import { useDemo } from '../../demoInfo';
 import { newKey, type AccessOutcome, type Pass } from '../events/types';
+import { Button } from '../../components/fui';
 
 interface Station {
   id: string;
@@ -90,7 +91,7 @@ export function PublicPassPage() {
       {user!.role === 'GATE_OPERATOR' && gates.length > 0 && <p className="small muted">You only see the gates you are assigned to.</p>}
       <div className="row" style={{ justifyContent: 'center' }}>
         {gates.map((g) => (
-          <button key={g.id} className={`btn-block gate-btn gate-btn-${g.mode.toLowerCase()}`} disabled={busy} onClick={() => scanAt(g)}>
+          <button key={g.id} className={`gate-btn gate-btn-${g.mode.toLowerCase()}`} disabled={busy} onClick={() => scanAt(g)}>
             {g.name} <span className="small">({g.reentry_enabled ? g.mode : 'CHECK-IN'})</span>
             {multipleEvents && <span className="small" style={{ display: 'block', opacity: 0.8 }}>{g.event_name}</span>}
           </button>
@@ -127,7 +128,7 @@ export function PublicPassPage() {
         </p>
       )}
       <div className="row" style={{ justifyContent: 'center' }}>
-        {demo?.seeded && <button onClick={switchToGateStaff}>Demo: sign in as gate staff</button>}
+        {demo?.seeded && <Button variant="solid" onClick={switchToGateStaff}>Demo: sign in as gate staff</Button>}
         <Link className="small muted" to={`/login?next=${encodeURIComponent(location.pathname)}`}>
           Staff: sign in to record this pass at a gate
         </Link>
@@ -150,9 +151,9 @@ export function PublicPassPage() {
       {data && <PassCard pass={data.pass} />}
       {data && !isStaff && (
         <div className="actions no-print" style={{ justifyContent: 'center' }}>
-          <button className="btn-secondary" onClick={() => window.print()}>
+          <Button variant="subtle" onClick={() => window.print()}>
             Print pass
-          </button>
+          </Button>
         </div>
       )}
       {notStaffHint}

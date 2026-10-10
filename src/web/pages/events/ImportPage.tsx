@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api';
-import { ErrorMessage, useLoad } from '../../components/ui';
+import { ErrorMessage, TableWrap, useLoad } from '../../components/ui';
 import { formatDateTime } from '../../format';
 import { useEventContext } from './EventLayout';
+import { Button, Select } from '../../components/fui';
 
 interface Row {
   row: number;
@@ -134,7 +135,7 @@ export function ImportPage() {
         />
         <label style={{ margin: 0 }}>
           Existing participants
-          <select
+          <Select
             value={policy}
             onChange={(ev) => {
               const p = ev.target.value as 'SKIP' | 'UPDATE';
@@ -144,7 +145,7 @@ export function ImportPage() {
           >
             <option value="SKIP">Skip (leave unchanged)</option>
             <option value="UPDATE">Update name/country/email</option>
-          </select>
+          </Select>
         </label>
       </div>
 
@@ -153,7 +154,7 @@ export function ImportPage() {
           {(['name', 'country', 'email'] as const).map((k) => (
             <label key={k}>
               Column for {k}
-              <select
+              <Select
                 value={mapping?.[k] ?? ''}
                 onChange={(ev) => {
                   const m = { ...(mapping ?? { name: -1, country: -1, email: -1 }), [k]: Number(ev.target.value) };
@@ -167,7 +168,7 @@ export function ImportPage() {
                     {h || `Column ${i + 1}`}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
           ))}
         </div>
@@ -186,15 +187,15 @@ export function ImportPage() {
         <div className="section">
           <div className="spread">
             <h2>Preview</h2>
-            <button disabled={busy || preview.summary.create + preview.summary.update === 0} onClick={commit}>
+            <Button variant="solid" disabled={busy || preview.summary.create + preview.summary.update === 0} onClick={commit}>
               Import {preview.summary.create} new{preview.summary.update ? `, update ${preview.summary.update}` : ''}
-            </button>
+            </Button>
           </div>
           <p className="small">
             {preview.summary.total} rows · <strong>{preview.summary.create}</strong> new · {preview.summary.update} update · {preview.summary.skip} skip ·{' '}
             <span style={{ color: preview.summary.error ? 'var(--bad)' : undefined }}>{preview.summary.error} errors</span> · {preview.summary.flagged} flagged
           </p>
-          <div className="table-wrap">
+          <TableWrap>
             <table>
               <thead>
                 <tr>
@@ -221,7 +222,7 @@ export function ImportPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableWrap>
           {preview.rows.length < preview.summary.total && (
             <p className="small muted">Showing all rows with errors or flags, plus the first 50 rows.</p>
           )}

@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../../api';
-import { ErrorMessage, StatusBadge, useLoad } from '../../components/ui';
+import { ErrorMessage, StatusBadge, TableWrap, useLoad } from '../../components/ui';
 import { formatDateTime } from '../../format';
 import { useEventContext } from './EventLayout';
+import { Button } from '../../components/fui';
 
 interface Delivery {
   id: string;
@@ -59,12 +60,12 @@ export function DeliveriesPage() {
             pass are not emailed again.
           </p>
           <div className="row">
-            <button disabled={busy} onClick={() => send('UNSENT')}>
+            <Button variant="solid" disabled={busy} onClick={() => send('UNSENT')}>
               Issue & send passes
-            </button>
-            <button className="btn-secondary" disabled={busy || !data?.counts.FAILED} onClick={() => send('FAILED')}>
+            </Button>
+            <Button variant="subtle" disabled={busy || !data?.counts.FAILED} onClick={() => send('FAILED')}>
               Retry all failed
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -74,15 +75,15 @@ export function DeliveriesPage() {
         <>
           <div className="row" style={{ marginBottom: '1rem' }}>
             {['', 'QUEUED', 'SENDING', 'SENT', 'FAILED', 'CANCELLED'].map((s) => (
-              <button key={s} className={`btn-sm ${status === s ? '' : 'btn-secondary'}`} onClick={() => setStatus(s)}>
+              <Button key={s} size="sm" variant={status === s ? 'solid' : 'subtle'} onClick={() => setStatus(s)}>
                 {s || 'All'} {s && data.counts[s] ? `(${data.counts[s]})` : ''}
-              </button>
+              </Button>
             ))}
           </div>
           {data.deliveries.length === 0 ? (
             <p className="muted">No emails.</p>
           ) : (
-            <div className="table-wrap">
+            <TableWrap>
               <table>
                 <thead>
                   <tr>
@@ -109,8 +110,8 @@ export function DeliveriesPage() {
                       <td className="small">{d.last_error}</td>
                       <td>
                         {d.delivery_status === 'FAILED' && (
-                          <button
-                            className="btn-secondary btn-sm"
+                          <Button variant="subtle" size="sm"
+                           
                             onClick={async () => {
                               try {
                                 await api.post(`/admin/event-pass-deliveries/${d.id}/retry`);
@@ -121,14 +122,14 @@ export function DeliveriesPage() {
                             }}
                           >
                             Retry
-                          </button>
+                          </Button>
                         )}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
-            </div>
+            </TableWrap>
           )}
         </>
       )}

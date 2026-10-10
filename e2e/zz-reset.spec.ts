@@ -5,6 +5,7 @@ import { expect, test } from '@playwright/test';
  * Chrome project (file name) so the suite leaves the demo freshly reset.
  */
 test('reset demo data from the demo menu', async ({ page }) => {
+  test.setTimeout(120_000); // the reset itself can take ~10–30 s
   // Leave a visible trace of an earlier demo: a session at Amber.
   await page.goto('/demo/weekly');
   await page.getByLabel('Session title').fill('Before reset');

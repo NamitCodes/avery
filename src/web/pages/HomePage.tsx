@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { DESK_STAFF, GATE_STAFF, ROLE_LABEL } from '../api';
 import { useAuth } from '../auth';
 import { useDemo } from '../demoInfo';
+import { buttonClass } from '../components/fui';
 
 export function HomePage() {
   const { user, loading } = useAuth();
@@ -21,10 +22,10 @@ export function HomePage() {
         <h1>Volunteer attendance</h1>
         <p className="muted">Scan the QR code displayed at your venue to record your attendance at an activity.</p>
         <div className="row">
-          <Link className="btn" to="/login">
+          <Link className={buttonClass({ variant: 'solid' })} to="/login">
             Sign in
           </Link>
-          <Link className="btn btn-secondary" to="/register">
+          <Link className={buttonClass({ variant: 'subtle' })} to="/register">
             Create account
           </Link>
         </div>
@@ -38,7 +39,7 @@ export function HomePage() {
       <p className="muted">
         {ROLE_LABEL[user.role]} · ID <span className="mono">{user.volunteer_code}</span>
       </p>
-      <div className="grid" style={{ marginTop: '1.5rem' }}>
+      <div className="card-grid" style={{ marginTop: '1.5rem' }}>
         <Link className="card" to="/me/attendance" style={{ textDecoration: 'none' }}>
           <strong>My attendance</strong>
           <p className="muted small">Sessions you have checked in to.</p>

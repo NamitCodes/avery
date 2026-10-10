@@ -1,14 +1,17 @@
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { Dialog } from '@rtcamp/frappe-ui-react';
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { ApiError } from '../api';
-import { STATUS_LABEL } from '../format';
+import { Button, StatusPill, Textarea } from './fui';
 
+/** Frappe Badge for a status code. */
 export function StatusBadge({ status }: { status: string }) {
-  return <span className={`badge badge-${status.toLowerCase()}`}>{STATUS_LABEL[status] ?? status}</span>;
+  return <StatusPill status={status} />;
 }
 
+/** Inline error in Frappe's red alert style (with field-level issues if any). */
 export function ErrorMessage({ error }: { error: unknown }) {
   if (!error) return null;
-  const message = error instanceof ApiError ? error.message : 'Something went wrong.';
+  const message = error instanceof ApiError ? error.message : error instanceof Error ? error.message : 'Something went wrong.';
   const issues = error instanceof ApiError ? (error.details.issues as { path: string; message: string }[] | undefined) : undefined;
   return (
     <div className="alert alert-error" role="alert">
@@ -51,28 +54,16 @@ export function useLoad<T>(loader: () => Promise<T>, deps: unknown[]) {
   return { data, error, loading, reload };
 }
 
-export function Modal({ title, onClose, children }: { title: string; onClose(): void; children: ReactNode }) {
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [onClose]);
+/** Frappe Dialog that is open while rendered; closing calls onClose. */
+export function Modal({ title, onClose, children, size = 'lg' }: { title: string; onClose(): void; children: ReactNode; size?: 'sm' | 'md' | 'lg' | 'xl' }) {
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal" role="dialog" aria-modal="true" aria-label={title} onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>{title}</h2>
-          <button className="btn-link" onClick={onClose} aria-label="Close">
-            ✕
-          </button>
-        </div>
-        {children}
-      </div>
-    </div>
+    <Dialog open onOpenChange={(open) => !open && onClose()} options={{ title, size }}>
+      <div className="text-ink-gray-7">{children}</div>
+    </Dialog>
   );
 }
 
-/** Prompt for a mandatory reason, then run an action. */
+/** Prompt for a (usually mandatory) reason, then run an action. */
 export function ReasonDialog({
   title,
   description,
@@ -114,22 +105,52 @@ export function ReasonDialog({
           }
         }}
       >
-        {description && <div className="muted">{description}</div>}
+        {description && <div className="text-p-base text-ink-gray-7 mb-3">{description}</div>}
         {children}
         <label>
-          Reason {optional ? <span className="muted">(optional)</span> : <span className="required">*</span>}
-          <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} required={!optional} minLength={optional ? undefined : 3} />
+          Reason {optional ? <span className="text-ink-gray-4">(optional)</span> : <span className="required">*</span>}
+          <Textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={3} />
         </label>
         <ErrorMessage error={error} />
         <div className="actions">
-          <button type="button" className="btn-secondary" onClick={onClose}>
+          <Button type="button" variant="subtle" onClick={onClose}>
             Cancel
-          </button>
-          <button type="submit" className={danger ? 'btn-danger' : ''} disabled={busy || !valid}>
-            {busy ? 'Working…' : confirmLabel}
-          </button>
+          </Button>
+          <Button type="submit" variant="solid" theme={danger ? 'red' : 'gray'} disabled={busy || !valid} loading={busy}>
+            {confirmLabel}
+          </Button>
         </div>
       </form>
     </Modal>
+  );
+}
+
+/**
+ * List table that turns into stacked cards on phones (CSS, ≤640px). Each cell is
+ * labelled with its column header (data-label), kept in sync as rows change.
+ */
+export function TableWrap({ children }: { children: ReactNode }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const label = () => {
+      const heads = Array.from(el.querySelectorAll('thead th')).map((th) => th.textContent?.trim() ?? '');
+      el.querySelectorAll('tbody tr').forEach((tr) =>
+        Array.from(tr.children).forEach((td, i) => {
+          if (td.getAttribute('data-label') !== (heads[i] ?? '')) td.setAttribute('data-label', heads[i] ?? '');
+        }),
+      );
+    };
+    label();
+    // Rows load and refresh asynchronously; relabel on structural changes only (no attribute feedback loop).
+    const mo = new MutationObserver(label);
+    mo.observe(el, { childList: true, subtree: true });
+    return () => mo.disconnect();
+  }, []);
+  return (
+    <div ref={ref} className="table-wrap stack-mobile">
+      {children}
+    </div>
   );
 }

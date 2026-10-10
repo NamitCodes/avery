@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { api } from '../../api';
+import { Badge } from '../../components/fui';
 import { ErrorMessage, useLoad } from '../../components/ui';
 
 interface Station {
@@ -24,15 +25,13 @@ export function StationsPage() {
         <>
           <h2>Gate scanners</h2>
           {data.gates.length === 0 && <p className="muted">No active gates are assigned to you. Ask an event administrator.</p>}
-          <div className="grid">
+          <div className="card-grid">
             {data.gates.map((g) => (
               <Link key={g.id} className="card" to={`/staff/gate/${g.id}`} style={{ textDecoration: 'none' }}>
                 <div className="small muted">{g.event_name}</div>
                 <strong>{g.name}</strong>
                 <div style={{ marginTop: '0.5rem' }}>
-                  <span className="badge" style={{ color: 'var(--fg)', borderColor: 'var(--fg)' }}>
-                    {g.mode}
-                  </span>
+                  <Badge theme={g.mode === 'ENTRY' ? 'green' : 'gray'} variant="subtle" size="md" label={g.mode} />
                 </div>
                 {g.location_description && <div className="small muted">{g.location_description}</div>}
               </Link>
@@ -41,7 +40,7 @@ export function StationsPage() {
           {data.desk_events.length > 0 && (
             <>
               <h2>Exception desk</h2>
-              <div className="grid">
+              <div className="card-grid">
                 {data.desk_events.map((e) => (
                   <Link key={e.id} className="card" to={`/staff/desk/${e.id}`} style={{ textDecoration: 'none' }}>
                     <strong>{e.name}</strong>

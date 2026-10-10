@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { api, type Location, type Session } from '../../api';
 import { ErrorMessage, useLoad } from '../../components/ui';
 import { toLocalInput } from '../../format';
+import { Button, Input, Select, Textarea } from '../../components/fui';
 
 const empty = { location_id: '', title: '', description: '', start_at: '', end_at: '', checkin_opens_at: '', checkin_closes_at: '' };
 
@@ -71,32 +72,32 @@ export function SessionFormPage() {
       <form onSubmit={(e) => submit(e)}>
         <label>
           Venue
-          <select value={form.location_id} onChange={set('location_id')} required>
+          <Select value={form.location_id} onChange={set('location_id')} required>
             <option value="">Choose a venue…</option>
             {locations.data?.locations.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.name}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <label>
           Activity title
-          <input value={form.title} onChange={set('title')} required maxLength={200} />
+          <Input value={form.title} onChange={set('title')} required maxLength={200} />
         </label>
         <label>
           Description <span className="muted">(optional — helps volunteers pick the right activity)</span>
-          <textarea rows={2} value={form.description} onChange={set('description')} maxLength={2000} />
+          <Textarea rows={2} value={form.description} onChange={set('description')} maxLength={2000} />
         </label>
         {venue && <p className="small muted">Times are in the venue’s time zone: {venue.timezone}</p>}
         <div className="form-grid">
           <label>
             Starts
-            <input type="datetime-local" value={form.start_at} onChange={set('start_at')} required />
+            <Input type="datetime-local" value={form.start_at} onChange={set('start_at')} required />
           </label>
           <label>
             Ends
-            <input type="datetime-local" value={form.end_at} onChange={set('end_at')} required />
+            <Input type="datetime-local" value={form.end_at} onChange={set('end_at')} required />
           </label>
         </div>
         <label className="check">
@@ -107,30 +108,30 @@ export function SessionFormPage() {
           <div className="form-grid">
             <label>
               Check-in opens
-              <input type="datetime-local" value={form.checkin_opens_at} onChange={set('checkin_opens_at')} required />
+              <Input type="datetime-local" value={form.checkin_opens_at} onChange={set('checkin_opens_at')} required />
             </label>
             <label>
               Check-in closes
-              <input type="datetime-local" value={form.checkin_closes_at} onChange={set('checkin_closes_at')} required />
+              <Input type="datetime-local" value={form.checkin_closes_at} onChange={set('checkin_closes_at')} required />
             </label>
           </div>
         )}
         {editing && (
           <label>
             Reason for change <span className="muted">(optional, recorded in the audit log)</span>
-            <input value={reason} onChange={(e) => setReason(e.target.value)} />
+            <Input value={reason} onChange={(e) => setReason(e.target.value)} />
           </label>
         )}
         <ErrorMessage error={error} />
         <div className="actions">
-          <button type="button" className="btn-secondary" onClick={() => navigate(-1)}>
+          <Button variant="subtle" type="button" onClick={() => navigate(-1)}>
             Cancel
-          </button>
-          <button disabled={busy}>{editing ? 'Save changes' : 'Save as draft'}</button>
+          </Button>
+          <Button variant="solid" disabled={busy}>{editing ? 'Save changes' : 'Save as draft'}</Button>
           {!editing && (
-            <button type="button" disabled={busy} onClick={(e) => submit(e as unknown as FormEvent, true)}>
+            <Button variant="solid" type="button" disabled={busy} onClick={(e) => submit(e as unknown as FormEvent, true)}>
               Save & publish
-            </button>
+            </Button>
           )}
         </div>
       </form>

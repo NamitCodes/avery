@@ -3,9 +3,10 @@ import { Link, useNavigate } from 'react-router-dom';
 import { api, ROLE_LABEL, type Role, type User } from '../api';
 import { useAuth } from '../auth';
 import { ResetDemoButton } from '../components/demoKit';
-import { ErrorMessage } from '../components/ui';
+import { ErrorMessage, TableWrap } from '../components/ui';
 import { loadDemo, type DemoInfo } from '../demoInfo';
 import { formatDateTime } from '../format';
+import { Button, buttonClass, Crumbs } from '../components/fui';
 
 interface OutboxMessage {
   to: string;
@@ -97,23 +98,21 @@ export function DemoPage() {
     const acct = demo.accounts.find((a) => a.key === as)!;
     const already = user?.email === acct.email;
     return (
-      <button className="btn-secondary btn-sm" onClick={() => signInAs(as, to)} title={`Signs in as ${acct.email}`}>
+      <Button variant="subtle" size="sm" onClick={() => signInAs(as, to)} title={`Signs in as ${acct.email}`}>
         {children}
         {!already && <span className="muted"> · as {acct.name.split(' ')[0]}</span>}
-      </button>
+      </Button>
     );
   };
   const CopyPass = ({ k }: { k: string }) => (
-    <button className="btn-secondary btn-sm" onClick={() => copy(pass(k).pass_url, k)}>
+    <Button variant="subtle" size="sm" onClick={() => copy(pass(k).pass_url, k)}>
       {copied === k ? 'Copied ✓' : `Copy ${pass(k).label.split(' —')[0]}’s pass`}
-    </button>
+    </Button>
   );
 
   return (
     <div className="demo">
-      <p className="small muted">
-        <Link to="/demo">Demos</Link> /
-      </p>
+      <Crumbs items={[{ label: 'Demos', to: "/demo" }]} current={'Full demo guide'} />
       <h1>Full demo guide</h1>
       <p className="muted">
         Sample data was loaded {formatDateTime(demo.seeded_at!)}
@@ -142,7 +141,7 @@ export function DemoPage() {
             event with imported participants, printed passes and entry/exit gates, and <strong>C</strong> open events with online registration, walk-ins and ID checks.
           </li>
           <li>
-            Every <span className="btn-secondary btn-sm demo-inline">button · as Name</span> below signs you in as the right person and opens the right page. You
+            Every <span className="demo-inline">button · as Name</span> below signs you in as the right person and opens the right page. You
             are currently signed in as <strong>{user ? `${user.name} (${ROLE_LABEL[user.role]})` : 'nobody'}</strong>.
           </li>
           <li>
@@ -166,7 +165,7 @@ export function DemoPage() {
         <p className="small muted">
           Password for every account: <code className="mono">{demo.password}</code>
         </p>
-        <div className="table-wrap">
+        <TableWrap>
           <table>
             <thead>
               <tr>
@@ -189,16 +188,16 @@ export function DemoPage() {
                     {user?.email === a.email ? (
                       <span className="small muted">signed in</span>
                     ) : (
-                      <button className="btn-secondary btn-sm" onClick={() => signInAs(a.key)}>
+                      <Button variant="subtle" size="sm" onClick={() => signInAs(a.key)}>
                         Sign in
-                      </button>
+                      </Button>
                     )}
                   </td>
                 </tr>
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       </section>
 
       <section id="story-a" className="demo-section">
@@ -288,7 +287,7 @@ export function DemoPage() {
             <Point>Inside now, unique check-ins, entries/exits, rejected scans by reason, per-gate totals, and a reconciliation check against the access history.</Point>
           </Step>
           <Step title="Import the participant list (preview first)">
-            <a className="btn btn-secondary btn-sm" href="/api/demo/sample-import.csv">
+            <a className={buttonClass({ variant: 'subtle', size: 'sm' })} href="/api/demo/sample-import.csv">
               Download sample CSV
             </a>{' '}
             <Go as="events" to={`/admin/events/${summit.id}/import`}>
@@ -309,7 +308,7 @@ export function DemoPage() {
             </Point>
           </Step>
           <Step title="Show a printable pass">
-            <a className="btn btn-secondary btn-sm" href={pass('amara').pass_path} target="_blank" rel="noreferrer">
+            <a className={buttonClass({ variant: 'subtle', size: 'sm' })} href={pass('amara').pass_path} target="_blank" rel="noreferrer">
               Open Amara’s pass
             </a>
             <Point>The QR holds only a random code — no name, email or country. Participants print it; no phone or app needed at the gate.</Point>
@@ -383,7 +382,7 @@ export function DemoPage() {
         </p>
         <ol className="steps">
           <Step title="Online registration without an account">
-            <a className="btn btn-secondary btn-sm" href={`/events/${fair.id}/register`} target="_blank" rel="noreferrer">
+            <a className={buttonClass({ variant: 'subtle', size: 'sm' })} href={`/events/${fair.id}/register`} target="_blank" rel="noreferrer">
               Open the Science of the Soul public form
             </a>
             <Point>Register with a phone number only. A printable pass appears immediately. Submitting the same email/phone again does not create a duplicate.</Point>
@@ -419,7 +418,7 @@ export function DemoPage() {
             </Point>
           </Step>
           <Step title="Email verification (contact, not identity)">
-            <a className="btn btn-secondary btn-sm" href={`/events/${workshop.id}/register`} target="_blank" rel="noreferrer">
+            <a className={buttonClass({ variant: 'subtle', size: 'sm' })} href={`/events/${workshop.id}/register`} target="_blank" rel="noreferrer">
               Open the Workshop form
             </a>
             <Point>
@@ -445,7 +444,7 @@ export function DemoPage() {
       <section id="passes" className="demo-section">
         <h2>Sample passes</h2>
         <p className="small muted">Scan these from the screen with a camera or scanner, or use “Copy” and paste into a gate scanner.</p>
-        <div className="grid">
+        <div className="card-grid">
           {demo.passes.map((p) => (
             <div key={p.key} className="card">
               <img src={p.qr_data_url} alt={`Pass QR for ${p.label}`} style={{ width: 140, height: 140, imageRendering: 'pixelated' }} />
@@ -458,10 +457,10 @@ export function DemoPage() {
                 Expected: <strong>{p.expect}</strong>
               </div>
               <div className="row">
-                <button className="btn-secondary btn-sm" onClick={() => copy(p.pass_url, p.key)}>
+                <Button variant="subtle" size="sm" onClick={() => copy(p.pass_url, p.key)}>
                   {copied === p.key ? 'Copied ✓' : 'Copy'}
-                </button>
-                <a className="btn btn-secondary btn-sm" href={p.pass_path} target="_blank" rel="noreferrer">
+                </Button>
+                <a className={buttonClass({ variant: 'subtle', size: 'sm' })} href={p.pass_path} target="_blank" rel="noreferrer">
                   Printable
                 </a>
               </div>
@@ -480,7 +479,7 @@ export function DemoPage() {
 
       <section id="venue-qrs" className="demo-section">
         <h2>Venue QR codes</h2>
-        <div className="grid">
+        <div className="card-grid">
           {demo.venues.map((v) => (
             <div key={v.key} className="card">
               <img src={v.qr_data_url} alt={`Venue QR for ${v.name}`} style={{ width: 140, height: 140, imageRendering: 'pixelated' }} />
@@ -503,8 +502,8 @@ export function DemoPage() {
         <ul>
           <li>
             <strong>Refresh demo times</strong> moves today’s sessions and the events back around the current time (keeps everything you did).{' '}
-            <button
-              className="btn-secondary btn-sm"
+            <Button variant="subtle" size="sm"
+             
               onClick={async () => {
                 setError(null);
                 try {
@@ -518,7 +517,7 @@ export function DemoPage() {
               }}
             >
               Refresh demo times
-            </button>
+            </Button>
           </li>
           <li>
             <strong>Start completely fresh:</strong> deletes everything done during demos and reloads the original demo data (about 10–30 seconds).{' '}
@@ -562,9 +561,9 @@ function Outbox() {
     <section id="outbox" className="demo-section">
       <div className="spread">
         <h2>Email outbox</h2>
-        <button className="btn-secondary btn-sm" onClick={load}>
+        <Button variant="subtle" size="sm" onClick={load}>
           Refresh
-        </button>
+        </Button>
       </div>
       <p className="small muted">In demo mode emails are not sent — the latest 50 appear here (verification codes, passes). Updates every 5 seconds.</p>
       {messages && messages.length === 0 && <p className="muted">No emails yet in this session.</p>}
@@ -588,9 +587,9 @@ function Outbox() {
                     {open === i && <pre className="small mono" style={{ whiteSpace: 'pre-wrap', margin: '0.5rem 0 0' }}>{m.text}</pre>}
                   </td>
                   <td className="right">
-                    <button className="btn-link small" onClick={() => setOpen(open === i ? null : i)}>
+                    <Button variant="ghost" className="small" onClick={() => setOpen(open === i ? null : i)}>
                       {open === i ? 'hide' : 'view'}
-                    </button>
+                    </Button>
                   </td>
                 </tr>
               );

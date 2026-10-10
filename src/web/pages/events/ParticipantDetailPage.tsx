@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { api, type AuditLog } from '../../api';
-import { ErrorMessage, ReasonDialog, StatusBadge, useLoad } from '../../components/ui';
+import { ErrorMessage, ReasonDialog, StatusBadge, TableWrap, useLoad } from '../../components/ui';
 import { formatDateTime } from '../../format';
 import { useEventContext } from './EventLayout';
 import { SOURCE_LABEL, stateLabel, type Participant } from './types';
+import { Button, buttonClass, Crumbs, Input, Select } from '../../components/fui';
 
 interface Credential {
   id: string;
@@ -94,16 +95,14 @@ export function ParticipantDetailPage() {
 
   return (
     <>
-      <p className="small muted">
-        <Link to={`/admin/events/${e.id}/participants`}>Participants</Link> /
-      </p>
+      <Crumbs items={[{ label: 'Participants', to: `/admin/events/${e.id}/participants` }]} current={p.name} />
       <div className="spread">
         <h2 style={{ margin: 0 }}>
           {p.name} {p.status !== 'ACTIVE' && <StatusBadge status={p.status === 'CANCELLED' ? 'CANCELLED' : 'INACTIVE'} />}
         </h2>
-        <button className="btn-secondary btn-sm" onClick={() => { setEdit({ name: p.name, country: p.country, email: p.email, phone: p.phone, status: p.status, needs_review: p.needs_review, review_note: p.review_note }); setDialog({ kind: 'edit' }); }}>
+        <Button variant="subtle" size="sm" onClick={() => { setEdit({ name: p.name, country: p.country, email: p.email, phone: p.phone, status: p.status, needs_review: p.needs_review, review_note: p.review_note }); setDialog({ kind: 'edit' }); }}>
           Correct details
-        </button>
+        </Button>
       </div>
       <dl className="kv" style={{ marginTop: '1rem' }}>
         <dt>Reference</dt>
@@ -149,25 +148,25 @@ export function ParticipantDetailPage() {
             <span>
               <StatusBadge status="ACTIVE" /> issued {formatDateTime(active.issued_at, tz)}
             </span>
-            <Link className="btn btn-secondary btn-sm" to={`/admin/event-passes/${active.id}/print`}>
+            <Link className={buttonClass({ variant: 'subtle', size: 'sm' })} to={`/admin/event-passes/${active.id}/print`}>
               Print pass
             </Link>
             {p.email && canManage && (
-              <button className="btn-secondary btn-sm" onClick={() => run(() => api.post(`/admin/events/${e.id}/passes/send`, { participant_ids: [p.id], issue_missing: false, scope: 'UNSENT' }), 'Email queued (if not already sent).')}>
+              <Button variant="subtle" size="sm" onClick={() => run(() => api.post(`/admin/events/${e.id}/passes/send`, { participant_ids: [p.id], issue_missing: false, scope: 'UNSENT' }), 'Email queued (if not already sent).')}>
                 Email pass
-              </button>
+              </Button>
             )}
-            <button className="btn-secondary btn-sm" onClick={() => setDialog({ kind: 'replace', id: active.id })}>
+            <Button variant="subtle" size="sm" onClick={() => setDialog({ kind: 'replace', id: active.id })}>
               Replace (lost / damaged)
-            </button>
-            <button className="btn-secondary btn-sm" onClick={() => setDialog({ kind: 'revoke', id: active.id })}>
+            </Button>
+            <Button variant="subtle" size="sm" onClick={() => setDialog({ kind: 'revoke', id: active.id })}>
               Revoke
-            </button>
+            </Button>
           </div>
         ) : (
           <div className="row">
             <span className="muted">No active pass.</span>
-            {p.status === 'ACTIVE' && <button className="btn-sm" onClick={() => setDialog({ kind: 'issue' })}>Issue pass</button>}
+            {p.status === 'ACTIVE' && <Button variant="solid" size="sm" onClick={() => setDialog({ kind: 'issue' })}>Issue pass</Button>}
           </div>
         )}
         {data.deliveries.length > 0 && (
@@ -192,9 +191,9 @@ export function ParticipantDetailPage() {
                   <td className="small">{d.last_error}</td>
                   <td>
                     {d.delivery_status === 'FAILED' && (
-                      <button className="btn-secondary btn-sm" onClick={() => run(() => api.post(`/admin/event-pass-deliveries/${d.id}/retry`), 'Retry queued.')}>
+                      <Button variant="subtle" size="sm" onClick={() => run(() => api.post(`/admin/event-pass-deliveries/${d.id}/retry`), 'Retry queued.')}>
                         Retry
-                      </button>
+                      </Button>
                     )}
                   </td>
                 </tr>
@@ -207,38 +206,38 @@ export function ParticipantDetailPage() {
       <div className="section">
         <h2>Desk actions</h2>
         <div className="row">
-          <button className="btn-secondary btn-sm" onClick={() => setDialog({ kind: 'access', direction: 'IN', override: false })}>
+          <Button variant="subtle" size="sm" onClick={() => setDialog({ kind: 'access', direction: 'IN', override: false })}>
             {e.reentry_enabled ? 'Record entry' : 'Check in'}
-          </button>
+          </Button>
           {e.reentry_enabled && (
-            <button className="btn-secondary btn-sm" onClick={() => setDialog({ kind: 'access', direction: 'OUT', override: false })}>
+            <Button variant="subtle" size="sm" onClick={() => setDialog({ kind: 'access', direction: 'OUT', override: false })}>
               Record exit
-            </button>
+            </Button>
           )}
-          <button className="btn-secondary btn-sm" onClick={() => setDialog({ kind: 'access', direction: 'IN', override: true })}>
+          <Button variant="subtle" size="sm" onClick={() => setDialog({ kind: 'access', direction: 'IN', override: true })}>
             Manual override…
-          </button>
+          </Button>
           {e.id_check_mode !== 'NOT_USED' && (
             <>
-              <button className="btn-secondary btn-sm" onClick={() => setDialog({ kind: 'id', outcome: 'CHECKED' })}>
+              <Button variant="subtle" size="sm" onClick={() => setDialog({ kind: 'id', outcome: 'CHECKED' })}>
                 ID checked
-              </button>
-              <button className="btn-secondary btn-sm" onClick={() => setDialog({ kind: 'id', outcome: 'FAILED' })}>
+              </Button>
+              <Button variant="subtle" size="sm" onClick={() => setDialog({ kind: 'id', outcome: 'FAILED' })}>
                 ID check failed
-              </button>
-              <button className="btn-secondary btn-sm" onClick={() => setDialog({ kind: 'id', outcome: 'OVERRIDDEN' })}>
+              </Button>
+              <Button variant="subtle" size="sm" onClick={() => setDialog({ kind: 'id', outcome: 'OVERRIDDEN' })}>
                 Override ID check
-              </button>
+              </Button>
             </>
           )}
           {p.email && p.contact_verification !== 'VERIFIED' && e.verification_policy === 'CONTACT_VERIFIED' && (
             <>
-              <button className="btn-secondary btn-sm" onClick={() => run(() => api.post(`${base}/verify-contact`, { action: 'start' }), 'Verification code sent.')}>
+              <Button variant="subtle" size="sm" onClick={() => run(() => api.post(`${base}/verify-contact`, { action: 'start' }), 'Verification code sent.')}>
                 Send email code
-              </button>
-              <button className="btn-secondary btn-sm" onClick={() => setDialog({ kind: 'contact', action: 'override' })}>
+              </Button>
+              <Button variant="subtle" size="sm" onClick={() => setDialog({ kind: 'contact', action: 'override' })}>
                 Override contact check
-              </button>
+              </Button>
             </>
           )}
         </div>
@@ -249,7 +248,7 @@ export function ParticipantDetailPage() {
         {data.access_events.length === 0 ? (
           <p className="muted">No scans yet.</p>
         ) : (
-          <div className="table-wrap">
+          <TableWrap>
             <table>
               <thead>
                 <tr>
@@ -274,16 +273,16 @@ export function ParticipantDetailPage() {
                     <td>{a.operator_name}</td>
                     <td>
                       {latestAccepted?.id === a.id && (
-                        <button className="btn-secondary btn-sm" onClick={() => setDialog({ kind: 'correct', id: a.id })}>
+                        <Button variant="subtle" size="sm" onClick={() => setDialog({ kind: 'correct', id: a.id })}>
                           Correct
-                        </button>
+                        </Button>
                       )}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableWrap>
         )}
       </div>
 
@@ -409,31 +408,31 @@ export function ParticipantDetailPage() {
         >
           <label>
             Name
-            <input value={edit.name ?? ''} onChange={(ev) => setEdit({ ...edit, name: ev.target.value })} />
+            <Input value={edit.name ?? ''} onChange={(ev) => setEdit({ ...edit, name: ev.target.value })} />
           </label>
           <label>
             Country
-            <input value={edit.country ?? ''} onChange={(ev) => setEdit({ ...edit, country: ev.target.value })} />
+            <Input value={edit.country ?? ''} onChange={(ev) => setEdit({ ...edit, country: ev.target.value })} />
           </label>
           {canManage && (
             <>
               <label>
                 Email
-                <input value={edit.email ?? ''} onChange={(ev) => setEdit({ ...edit, email: ev.target.value || null })} />
+                <Input value={edit.email ?? ''} onChange={(ev) => setEdit({ ...edit, email: ev.target.value || null })} />
               </label>
               <label>
                 Phone
-                <input value={edit.phone ?? ''} onChange={(ev) => setEdit({ ...edit, phone: ev.target.value || null })} />
+                <Input value={edit.phone ?? ''} onChange={(ev) => setEdit({ ...edit, phone: ev.target.value || null })} />
               </label>
             </>
           )}
           <label>
             Status
-            <select value={edit.status} onChange={(ev) => setEdit({ ...edit, status: ev.target.value as Participant['status'] })}>
+            <Select value={edit.status} onChange={(ev) => setEdit({ ...edit, status: ev.target.value as Participant['status'] })}>
               <option value="ACTIVE">Active</option>
               <option value="INACTIVE">Inactive</option>
               <option value="CANCELLED">Cancelled</option>
-            </select>
+            </Select>
           </label>
           <label className="check">
             <input type="checkbox" checked={!!edit.needs_review} onChange={(ev) => setEdit({ ...edit, needs_review: ev.target.checked })} />

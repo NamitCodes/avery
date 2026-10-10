@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api, qs } from '../../api';
-import { ErrorMessage, StatusBadge, useLoad } from '../../components/ui';
+import { ErrorMessage, StatusBadge, TableWrap, useLoad } from '../../components/ui';
 import { useEventContext } from './EventLayout';
 import { SOURCE_LABEL, stateLabel, type Participant } from './types';
+import { Button, buttonClass, Input, Select } from '../../components/fui';
 
 export function ParticipantsPage() {
   const { event: e, canManage } = useEventContext();
@@ -42,55 +43,55 @@ export function ParticipantsPage() {
       >
         <label style={{ flex: 2 }}>
           Search
-          <input placeholder="Name, reference, email or phone" value={search} onChange={(ev) => setSearch(ev.target.value)} />
+          <Input placeholder="Name, reference, email or phone" value={search} onChange={(ev) => setSearch(ev.target.value)} />
         </label>
         <label>
           Country
-          <input defaultValue={filters.country} onBlur={(ev) => set('country', ev.target.value)} />
+          <Input defaultValue={filters.country} onBlur={(ev) => set('country', ev.target.value)} />
         </label>
         <label>
           State
-          <select value={filters.state} onChange={(ev) => set('state', ev.target.value)}>
+          <Select value={filters.state} onChange={(ev) => set('state', ev.target.value)}>
             <option value="">Any</option>
             <option value="NOT_CHECKED_IN">Not checked in</option>
             <option value="CHECKED_IN">Checked in</option>
             {e.reentry_enabled && <option value="INSIDE">Inside now</option>}
             {e.reentry_enabled && <option value="OUTSIDE">Outside</option>}
-          </select>
+          </Select>
         </label>
         <label>
           Pass
-          <select value={filters.pass_status} onChange={(ev) => set('pass_status', ev.target.value)}>
+          <Select value={filters.pass_status} onChange={(ev) => set('pass_status', ev.target.value)}>
             <option value="">Any</option>
             <option value="ACTIVE">Has active pass</option>
             <option value="NONE">No active pass</option>
-          </select>
+          </Select>
         </label>
         <label>
           Source
-          <select value={filters.source} onChange={(ev) => set('source', ev.target.value)}>
+          <Select value={filters.source} onChange={(ev) => set('source', ev.target.value)}>
             <option value="">Any</option>
             {Object.entries(SOURCE_LABEL).map(([k, v]) => (
               <option key={k} value={k}>
                 {v}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <label className="check" style={{ minWidth: 0, flex: 0, whiteSpace: 'nowrap' }}>
           <input type="checkbox" checked={filters.needs_review === '1'} onChange={(ev) => set('needs_review', ev.target.checked ? '1' : '')} />
           Needs review
         </label>
-        <button className="btn-secondary">Search</button>
+        <Button variant="subtle">Search</Button>
       </form>
       <div className="spread" style={{ marginBottom: '0.5rem' }}>
         <span className="muted small">{data ? `${data.total} participant${data.total === 1 ? '' : 's'}` : ''}</span>
         {canManage && (
           <div className="row">
-            <a className="btn btn-secondary btn-sm" href={`/api/admin/events/${e.id}/participants/export.csv${qs({ ...filters, page: undefined })}`}>
+            <a className={buttonClass({ variant: 'subtle', size: 'sm' })} href={`/api/admin/events/${e.id}/participants/export.csv${qs({ ...filters, page: undefined })}`}>
               Export participants
             </a>
-            <a className="btn btn-secondary btn-sm" href={`/api/admin/events/${e.id}/attendance.csv`}>
+            <a className={buttonClass({ variant: 'subtle', size: 'sm' })} href={`/api/admin/events/${e.id}/attendance.csv`}>
               Export attendance
             </a>
           </div>
@@ -98,7 +99,7 @@ export function ParticipantsPage() {
       </div>
       <ErrorMessage error={error} />
       {data && (
-        <div className="table-wrap">
+        <TableWrap>
           <table>
             <thead>
               <tr>
@@ -136,19 +137,19 @@ export function ParticipantsPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       )}
       {pages > 1 && (
         <div className="row" style={{ justifyContent: 'center', marginTop: '1rem' }}>
-          <button className="btn-secondary btn-sm" disabled={Number(filters.page) <= 1} onClick={() => set('page', String(Number(filters.page) - 1))}>
+          <Button variant="subtle" size="sm" disabled={Number(filters.page) <= 1} onClick={() => set('page', String(Number(filters.page) - 1))}>
             Previous
-          </button>
+          </Button>
           <span className="small muted">
             Page {filters.page} of {pages}
           </span>
-          <button className="btn-secondary btn-sm" disabled={Number(filters.page) >= pages} onClick={() => set('page', String(Number(filters.page) + 1))}>
+          <Button variant="subtle" size="sm" disabled={Number(filters.page) >= pages} onClick={() => set('page', String(Number(filters.page) + 1))}>
             Next
-          </button>
+          </Button>
         </div>
       )}
     </>

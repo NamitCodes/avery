@@ -4,6 +4,7 @@ import { api, ApiError } from '../../api';
 import { errorOutcome, ResultCard } from '../../components/GateResult';
 import { ErrorMessage, useLoad } from '../../components/ui';
 import { newKey, type AccessOutcome } from '../events/types';
+import { Button, Input } from '../../components/fui';
 
 interface GateInfo {
   gate: { id: string; name: string; mode: 'ENTRY' | 'EXIT'; status: string };
@@ -149,9 +150,10 @@ export function GateScannerPage() {
             void submit(input);
           }}
         >
-          <input
+          <Input
             ref={inputRef}
             className="gate-input"
+            size="xl"
             autoFocus
             autoComplete="off"
             placeholder="Scan pass…"
@@ -173,12 +175,12 @@ export function GateScannerPage() {
             <div className="verdict">NOT CONFIRMED</div>
             <div className="msg">Could not reach the server. Do not admit yet.</div>
             <div className="row" style={{ justifyContent: 'center', marginTop: '1rem' }}>
-              <button className="btn-secondary" onClick={() => submit(view.scanned, view.key)}>
+              <Button variant="subtle" onClick={() => submit(view.scanned, view.key)}>
                 Retry this scan
-              </button>
-              <button className="btn-secondary" onClick={() => setView({ kind: 'idle' })}>
+              </Button>
+              <Button variant="subtle" onClick={() => setView({ kind: 'idle' })}>
                 Dismiss — send to exception desk
-              </button>
+              </Button>
             </div>
           </div>
         )}
@@ -186,9 +188,9 @@ export function GateScannerPage() {
 
         {window.BarcodeDetector && (
           <div className="no-print">
-            <button className="btn-secondary btn-sm" onClick={() => setCamera(!camera)}>
+            <Button variant="subtle" size="sm" onClick={() => setCamera(!camera)}>
               {camera ? 'Stop camera' : 'Use camera'}
-            </button>
+            </Button>
             {camera && <video ref={videoRef} muted playsInline style={{ display: 'block', width: 320, maxWidth: '100%', marginTop: '0.75rem', borderRadius: 6 }} />}
           </div>
         )}

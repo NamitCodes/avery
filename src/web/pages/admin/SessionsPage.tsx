@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { api, qs, type Location, type SessionListItem } from '../../api';
-import { ErrorMessage, ReasonDialog, StatusBadge, useLoad } from '../../components/ui';
+import { ErrorMessage, ReasonDialog, StatusBadge, TableWrap, useLoad } from '../../components/ui';
 import { formatRange, todayIso } from '../../format';
+import { Button, buttonClass, Input, Select } from '../../components/fui';
 
 const STATUSES = ['DRAFT', 'SCHEDULED', 'OPEN', 'CLOSED', 'CANCELLED', 'ARCHIVED'];
 
@@ -43,33 +44,33 @@ export function SessionsPage() {
     <>
       <div className="spread">
         <h1>Sessions</h1>
-        <Link className="btn" to="/admin/sessions/new">
+        <Link className={buttonClass({ variant: 'solid' })} to="/admin/sessions/new">
           New session
         </Link>
       </div>
       <div className="filters">
         <label>
           From
-          <input type="date" value={filters.from} onChange={(e) => set('from', e.target.value)} />
+          <Input type="date" value={filters.from} onChange={(e) => set('from', e.target.value)} />
         </label>
         <label>
           To
-          <input type="date" value={filters.to} onChange={(e) => set('to', e.target.value)} />
+          <Input type="date" value={filters.to} onChange={(e) => set('to', e.target.value)} />
         </label>
         <label>
           Venue
-          <select value={filters.location_id} onChange={(e) => set('location_id', e.target.value)}>
+          <Select value={filters.location_id} onChange={(e) => set('location_id', e.target.value)}>
             <option value="">All venues</option>
             {locations.data?.locations.map((l) => (
               <option key={l.id} value={l.id}>
                 {l.name}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
         <label>
           Activity
-          <input
+          <Input
             placeholder="Search title"
             defaultValue={filters.q}
             onKeyDown={(e) => e.key === 'Enter' && set('q', e.currentTarget.value)}
@@ -78,18 +79,18 @@ export function SessionsPage() {
         </label>
         <label>
           Status
-          <select value={filters.status} onChange={(e) => set('status', e.target.value)}>
+          <Select value={filters.status} onChange={(e) => set('status', e.target.value)}>
             <option value="">Any (except archived)</option>
             {STATUSES.map((s) => (
               <option key={s}>{s}</option>
             ))}
-          </select>
+          </Select>
         </label>
       </div>
       <ErrorMessage error={sessions.error ?? error} />
       {sessions.data && sessions.data.sessions.length === 0 && <p className="muted">No sessions match these filters.</p>}
       {sessions.data && sessions.data.sessions.length > 0 && (
-        <div className="table-wrap">
+        <TableWrap>
           <table>
             <thead>
               <tr>
@@ -115,28 +116,28 @@ export function SessionsPage() {
                   <td className="right">{s.attendance_count}</td>
                   <td>
                     <div className="row">
-                      <Link className="btn btn-secondary btn-sm" to={`/admin/sessions/${s.id}`}>
+                      <Link className={buttonClass({ variant: 'subtle', size: 'sm' })} to={`/admin/sessions/${s.id}`}>
                         View
                       </Link>
                       {!['CANCELLED', 'ARCHIVED'].includes(s.status) && (
-                        <Link className="btn btn-secondary btn-sm" to={`/admin/sessions/${s.id}/edit`}>
+                        <Link className={buttonClass({ variant: 'subtle', size: 'sm' })} to={`/admin/sessions/${s.id}/edit`}>
                           Edit
                         </Link>
                       )}
                       {s.status === 'DRAFT' && (
-                        <button className="btn-secondary btn-sm" onClick={() => act(s, 'publish')}>
+                        <Button variant="subtle" size="sm" onClick={() => act(s, 'publish')}>
                           Publish
-                        </button>
+                        </Button>
                       )}
                       {['SCHEDULED', 'OPEN'].includes(s.status) && (
-                        <button className="btn-secondary btn-sm" onClick={() => setPending({ s, action: 'close' })}>
+                        <Button variant="subtle" size="sm" onClick={() => setPending({ s, action: 'close' })}>
                           Close
-                        </button>
+                        </Button>
                       )}
                       {!['CANCELLED', 'ARCHIVED'].includes(s.status) && (
-                        <button className="btn-secondary btn-sm" onClick={() => setPending({ s, action: 'cancel' })}>
+                        <Button variant="subtle" size="sm" onClick={() => setPending({ s, action: 'cancel' })}>
                           Cancel
-                        </button>
+                        </Button>
                       )}
                     </div>
                   </td>
@@ -144,7 +145,7 @@ export function SessionsPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       )}
       {pending && (
         <ReasonDialog

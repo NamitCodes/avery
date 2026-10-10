@@ -156,7 +156,7 @@ test('admin pages render', async ({ page }) => {
     ['/staff', 'Stations'],
   ]) {
     await page.goto(path);
-    await expect(page.getByRole('heading', { name: heading, exact: true })).toBeVisible();
+    await expect(page.locator('.page-body').getByRole('heading', { name: heading, exact: true })).toBeVisible();
   }
   expect(errors).toEqual([]);
 });

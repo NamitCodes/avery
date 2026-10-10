@@ -5,6 +5,7 @@ import { BigQr, DemoPageShell, DemoStep, qrSrc, usePolling, usePresenter } from 
 import { ErrorMessage, StatusBadge } from '../../components/ui';
 import { formatTimeWithSeconds } from '../../format';
 import type { Participant, Pass } from '../events/types';
+import { Button, Input, Select } from '../../components/fui';
 
 interface AccessRow {
   id: string;
@@ -101,15 +102,15 @@ export function DemoSummitPage() {
       <DemoStep n={2} who="Laptop" title="Add a participant and print their pass">
         <p className="muted small">Normally a list of thousands is imported from a spreadsheet and passes are emailed. Here we add one person the same way.</p>
         <div className="row">
-          <input placeholder="Name (optional)" value={name} onChange={(e) => setName(e.target.value)} style={{ maxWidth: 260 }} />
-          <select value={country} onChange={(e) => setCountry(e.target.value)} style={{ maxWidth: 180 }}>
+          <Input placeholder="Name (optional)" value={name} onChange={(e) => setName(e.target.value)} style={{ maxWidth: 260 }} />
+          <Select value={country} onChange={(e) => setCountry(e.target.value)} style={{ maxWidth: 180 }}>
             {COUNTRIES.map((c) => (
               <option key={c}>{c}</option>
             ))}
-          </select>
-          <button onClick={createGuest} disabled={busy || !ready}>
+          </Select>
+          <Button variant="solid" onClick={createGuest} disabled={busy || !ready}>
             {busy ? 'Creating…' : guest ? 'Create another participant' : 'Create participant & pass'}
-          </button>
+          </Button>
         </div>
       </DemoStep>
 

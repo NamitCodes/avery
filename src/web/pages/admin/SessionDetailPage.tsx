@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, qs, type AuditLog, type Location, type QrCode, type Session } from '../../api';
-import { ErrorMessage, Modal, ReasonDialog, StatusBadge, useLoad } from '../../components/ui';
+import { ErrorMessage, Modal, ReasonDialog, StatusBadge, TableWrap, useLoad } from '../../components/ui';
 import { formatDateTime, formatRange, formatTime, formatTimeWithSeconds, toLocalInput } from '../../format';
+import { Button, buttonClass, Crumbs, Input, Select, Textarea } from '../../components/fui';
 
 interface Detail {
   session: Session;
@@ -77,48 +78,46 @@ export function SessionDetailPage() {
 
   return (
     <>
-      <p className="small muted">
-        <Link to="/admin/sessions">Sessions</Link> /
-      </p>
+      <Crumbs items={[{ label: 'Sessions', to: "/admin/sessions" }]} current={s.title} />
       <div className="spread">
         <h1>
           {s.title} <StatusBadge status={s.status} />
         </h1>
         <div className="row">
           {!['CANCELLED', 'ARCHIVED'].includes(s.status) && (
-            <Link className="btn btn-secondary" to={`/admin/sessions/${id}/edit`}>
+            <Link className={buttonClass({ variant: 'subtle' })} to={`/admin/sessions/${id}/edit`}>
               Edit
             </Link>
           )}
-          {s.status === 'DRAFT' && <button onClick={() => act('publish').catch(setError)}>Publish</button>}
+          {s.status === 'DRAFT' && <Button variant="solid" onClick={() => act('publish').catch(setError)}>Publish</Button>}
           {s.status === 'SCHEDULED' && (
-            <button onClick={() => setDialog({ kind: 'action', action: 'open', label: 'Open check-in now', optional: true })}>Open early</button>
+            <Button variant="solid" onClick={() => setDialog({ kind: 'action', action: 'open', label: 'Open check-in now', optional: true })}>Open early</Button>
           )}
           {['SCHEDULED', 'OPEN'].includes(s.status) && (
-            <button className="btn-secondary" onClick={() => setDialog({ kind: 'action', action: 'close', label: 'Close check-in', optional: true })}>
+            <Button variant="subtle" onClick={() => setDialog({ kind: 'action', action: 'close', label: 'Close check-in', optional: true })}>
               Close
-            </button>
+            </Button>
           )}
           {s.status === 'CLOSED' && (
-            <button className="btn-secondary" onClick={() => setDialog({ kind: 'action', action: 'reopen', label: 'Reopen check-in' })}>
+            <Button variant="subtle" onClick={() => setDialog({ kind: 'action', action: 'reopen', label: 'Reopen check-in' })}>
               Reopen
-            </button>
+            </Button>
           )}
           {['CLOSED', 'CANCELLED'].includes(s.status) && (
-            <button className="btn-secondary" onClick={() => act('archive').catch(setError)}>
+            <Button variant="subtle" onClick={() => act('archive').catch(setError)}>
               Archive
-            </button>
+            </Button>
           )}
           {!['CANCELLED', 'ARCHIVED'].includes(s.status) && (
-            <button className="btn-secondary" onClick={() => setDialog({ kind: 'action', action: 'cancel', label: 'Cancel session', danger: true, optional: true })}>
+            <Button variant="subtle" onClick={() => setDialog({ kind: 'action', action: 'cancel', label: 'Cancel session', danger: true, optional: true })}>
               Cancel session
-            </button>
+            </Button>
           )}
         </div>
       </div>
       <ErrorMessage error={error} />
 
-      <div className="grid">
+      <div className="card-grid">
         <div className="stat">
           <div className="value">{detail.data.attendance_count}</div>
           <div className="label">Volunteers checked in</div>
@@ -166,17 +165,17 @@ export function SessionDetailPage() {
         <div className="spread">
           <h2>Attendance</h2>
           <div className="row">
-            <input placeholder="Search name or ID" value={q} onChange={(e) => setQ(e.target.value)} style={{ width: 220 }} />
-            <a className="btn btn-secondary" href={`/api/admin/reports/attendance.csv?session_id=${id}`}>
+            <Input placeholder="Search name or ID" value={q} onChange={(e) => setQ(e.target.value)} style={{ width: 220 }} />
+            <a className={buttonClass({ variant: 'subtle' })} href={`/api/admin/reports/attendance.csv?session_id=${id}`}>
               Export CSV
             </a>
-            {!['DRAFT', 'CANCELLED', 'ARCHIVED'].includes(s.status) && <button onClick={() => setDialog({ kind: 'add' })}>Add manually</button>}
+            {!['DRAFT', 'CANCELLED', 'ARCHIVED'].includes(s.status) && <Button variant="solid" onClick={() => setDialog({ kind: 'add' })}>Add manually</Button>}
           </div>
         </div>
         <ErrorMessage error={attendance.error} />
         {attendance.data && attendance.data.attendance.length === 0 && <p className="muted">No one has checked in{q ? ' matching that search' : ''}.</p>}
         {attendance.data && attendance.data.attendance.length > 0 && (
-          <div className="table-wrap">
+          <TableWrap>
             <table>
               <thead>
                 <tr>
@@ -207,16 +206,16 @@ export function SessionDetailPage() {
                     </td>
                     <td className="right">
                       {s.status !== 'ARCHIVED' && (
-                        <button className="btn-secondary btn-sm" onClick={() => setDialog({ kind: 'correct', row: a })}>
+                        <Button variant="subtle" size="sm" onClick={() => setDialog({ kind: 'correct', row: a })}>
                           Correct
-                        </button>
+                        </Button>
                       )}
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
-          </div>
+          </TableWrap>
         )}
       </div>
 
@@ -304,14 +303,14 @@ function AddAttendanceDialog({ sessionId, tz, onClose, onDone }: { sessionId: st
         {volunteer ? (
           <p>
             <strong>{volunteer.name}</strong> <span className="mono small">{volunteer.volunteer_code}</span>{' '}
-            <button type="button" className="btn-link small" onClick={() => setVolunteer(null)}>
+            <Button variant="ghost" type="button" className="small" onClick={() => setVolunteer(null)}>
               change
-            </button>
+            </Button>
           </p>
         ) : (
           <label>
             Volunteer
-            <input autoFocus placeholder="Name, email or ID" value={search} onChange={(e) => setSearch(e.target.value)} />
+            <Input autoFocus placeholder="Name, email or ID" value={search} onChange={(e) => setSearch(e.target.value)} />
             {results.data?.volunteers.slice(0, 8).map((v) => (
               <button type="button" key={v.id} className="choice" disabled={v.status !== 'ACTIVE'} onClick={() => setVolunteer(v)}>
                 {v.name} <span className="mono small muted">{v.volunteer_code}</span>
@@ -322,18 +321,18 @@ function AddAttendanceDialog({ sessionId, tz, onClose, onDone }: { sessionId: st
         )}
         <label>
           Tap-in time <span className="muted">(optional, {tz}; defaults to now)</span>
-          <input type="datetime-local" value={time} onChange={(e) => setTime(e.target.value)} />
+          <Input type="datetime-local" value={time} onChange={(e) => setTime(e.target.value)} />
         </label>
         <label>
           Reason <span className="required">*</span>
-          <textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} required minLength={3} />
+          <Textarea rows={2} value={reason} onChange={(e) => setReason(e.target.value)} required minLength={3} />
         </label>
         <ErrorMessage error={error} />
         <div className="actions">
-          <button type="button" className="btn-secondary" onClick={onClose}>
+          <Button variant="subtle" type="button" onClick={onClose}>
             Cancel
-          </button>
-          <button disabled={busy || !volunteer || reason.trim().length < 3}>Add attendance</button>
+          </Button>
+          <Button variant="solid" disabled={busy || !volunteer || reason.trim().length < 3}>Add attendance</Button>
         </div>
       </form>
     </Modal>
@@ -358,14 +357,14 @@ function CorrectDialog({ row, tz, onClose, onDone }: { row: AttendanceRow; tz: s
     >
       <label>
         Tap-in time ({tz})
-        <input type="datetime-local" step={1} value={time} onChange={(e) => setTime(e.target.value)} />
+        <Input type="datetime-local" step={1} value={time} onChange={(e) => setTime(e.target.value)} />
       </label>
       <label>
         Record status
-        <select value={status} onChange={(e) => setStatus(e.target.value as AttendanceRow['status'])}>
+        <Select value={status} onChange={(e) => setStatus(e.target.value as AttendanceRow['status'])}>
           <option value="ACTIVE">Active</option>
           <option value="VOIDED">Voided (did not attend / recorded in error)</option>
-        </select>
+        </Select>
       </label>
       {history.data && history.data.history.length > 0 && (
         <div className="small" style={{ marginBottom: '1rem' }}>

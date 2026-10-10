@@ -1,6 +1,7 @@
 import { Link, useParams } from 'react-router-dom';
 import { api, type Location } from '../../api';
 import { ErrorMessage, useLoad } from '../../components/ui';
+import { Button } from '../../components/fui';
 
 /** Printable venue poster: QR, venue name and basic instructions. */
 export function QrPrintPage() {
@@ -18,7 +19,7 @@ export function QrPrintPage() {
     <div className="qr-sheet">
       <div className="no-print row" style={{ justifyContent: 'space-between', marginBottom: '2rem' }}>
         <Link to={`/admin/venues/${data.id}`}>← Back</Link>
-        <button onClick={() => window.print()}>Print</button>
+        <Button variant="solid" onClick={() => window.print()}>Print</Button>
       </div>
       <p className="muted">Volunteer attendance</p>
       <h1>{data.name}</h1>

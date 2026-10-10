@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api, ApiError } from '../api';
 import { formatDate, formatRange, formatTime, formatTimeWithSeconds } from '../format';
+import { Button } from '../components/fui';
 
 interface VenueSession {
   id: string;
@@ -80,9 +81,9 @@ export function CheckInPage() {
         <h1>Can’t check in here</h1>
         <div className="alert alert-error">{step.error.message}</div>
         {step.error.isNetwork && (
-          <button className="btn-secondary" onClick={load}>
+          <Button variant="subtle" onClick={load}>
             Try again
-          </button>
+          </Button>
         )}
       </>
     );
@@ -128,9 +129,9 @@ export function CheckInPage() {
       <>
         {venueHeader}
         <div className="alert">There are no activities currently accepting attendance at this venue.</div>
-        <button className="btn-secondary" onClick={load}>
+        <Button variant="subtle" onClick={load}>
           Refresh
-        </button>
+        </Button>
       </>
     );
   }
@@ -150,14 +151,14 @@ export function CheckInPage() {
             {s.already_checked_in_at && <div className="small">Checked in at {formatTime(s.already_checked_in_at, tz)}</div>}
           </button>
         ))}
-        <button
-          className="btn-block"
+        <Button variant="solid" size="lg"
+          className="w-full"
           style={{ marginTop: '1rem' }}
           disabled={!selected}
           onClick={() => setStep({ kind: 'confirm', session: data.sessions.find((s) => s.id === selected)! })}
         >
           Continue
-        </button>
+        </Button>
       </>
     );
   }
@@ -188,13 +189,13 @@ export function CheckInPage() {
         </div>
       )}
 
-      <button className="btn-block" style={{ marginTop: '1rem' }} disabled={step.kind === 'submitting'} onClick={() => confirm(session)}>
+      <Button variant="solid" size="lg" className="w-full" style={{ marginTop: '1rem' }} disabled={step.kind === 'submitting'} onClick={() => confirm(session)}>
         {step.kind === 'submitting' ? 'Confirming…' : step.kind === 'failed' && step.error.isNetwork ? 'Try again' : 'Confirm attendance'}
-      </button>
+      </Button>
       {data.sessions.length > 1 && step.kind !== 'submitting' && (
-        <button className="btn-link" style={{ marginTop: '1rem' }} onClick={() => setStep({ kind: 'choose' })}>
+        <Button variant="ghost" style={{ marginTop: '1rem' }} onClick={() => setStep({ kind: 'choose' })}>
           Choose a different activity
-        </button>
+        </Button>
       )}
     </>
   );

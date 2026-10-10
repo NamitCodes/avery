@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
 import { api, EVENT_MANAGERS } from '../../api';
 import { useAuth } from '../../auth';
-import { ErrorMessage, StatusBadge, useLoad } from '../../components/ui';
+import { ErrorMessage, StatusBadge, TableWrap, useLoad } from '../../components/ui';
 import { formatRange } from '../../format';
 import { POLICY_LABEL, type EventRecord } from './types';
+import { buttonClass } from '../../components/fui';
 
 export function EventsPage() {
   const { user } = useAuth();
@@ -14,7 +15,7 @@ export function EventsPage() {
       <div className="spread">
         <h1>Events</h1>
         {canManage && (
-          <Link className="btn" to="/admin/events/new">
+          <Link className={buttonClass({ variant: 'solid' })} to="/admin/events/new">
             New event
           </Link>
         )}
@@ -22,7 +23,7 @@ export function EventsPage() {
       <ErrorMessage error={error} />
       {data && data.events.length === 0 && <p className="muted">No events yet.</p>}
       {data && data.events.length > 0 && (
-        <div className="table-wrap">
+        <TableWrap>
           <table>
             <thead>
               <tr>
@@ -58,7 +59,7 @@ export function EventsPage() {
               ))}
             </tbody>
           </table>
-        </div>
+        </TableWrap>
       )}
     </>
   );
