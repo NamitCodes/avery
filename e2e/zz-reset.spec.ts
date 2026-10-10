@@ -18,7 +18,7 @@ test('reset demo data from the demo menu', async ({ page }) => {
   // The dialog stays open until the reset finishes and the page reloads.
   await expect(page.getByRole('dialog')).toBeHidden({ timeout: 90_000 });
   // The laptop is signed back in as the (recreated) demo admin.
-  await expect(page.locator('.demo-banner')).toContainText('signed in as Avery Admin');
+  await expect(page.locator('.demo-banner')).toContainText('signed in as Admin');
 
   await page.goto('/demo/weekly');
   await expect(page.getByText('Open now at')).not.toContainText('Before reset');

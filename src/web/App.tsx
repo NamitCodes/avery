@@ -58,7 +58,7 @@ function Layout({ narrow = false }: { narrow?: boolean }) {
       )}
       <header className="topbar">
         <Link to="/" className="brand">
-          Attendance
+          RSSB
         </Link>
         <nav>
           {demo && <NavLink to="/demo">Demos</NavLink>}

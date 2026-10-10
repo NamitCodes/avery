@@ -23,7 +23,7 @@ export const DEMO_PASSWORD = 'demo1234';
 const TZ = 'Asia/Singapore';
 
 export const DEMO_ACCOUNTS = [
-  { key: 'admin', email: 'admin@demo.org', name: 'Avery Admin', role: 'ADMIN', label: 'Administrator — everything' },
+  { key: 'admin', email: 'admin@demo.org', name: 'Admin', role: 'ADMIN', label: 'Administrator — everything' },
   { key: 'events', email: 'events@demo.org', name: 'Eli Events', role: 'EVENT_ADMIN', label: 'Event administrator' },
   { key: 'desk', email: 'desk@demo.org', name: 'Dana Desk', role: 'EXCEPTION_DESK', label: 'Exception desk' },
   { key: 'gate', email: 'gate@demo.org', name: 'Gabe Gate', role: 'GATE_OPERATOR', label: 'Gate operator (Planned-visits gates only)' },
