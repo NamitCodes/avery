@@ -17,6 +17,7 @@ import { registerOnline, registerWalkIn } from '../services/events/registration.
 import { recordStaffVerification } from '../services/events/verification.js';
 import { adminCorrectAttendance } from '../services/attendance.js';
 import { issueQrCode } from '../services/venues.js';
+import { runMigrations } from '../migrate.js';
 
 export const DEMO_PASSWORD = 'demo1234';
 const TZ = 'Asia/Singapore';
@@ -456,6 +457,25 @@ export async function seedDemo(baseCtx: AppContext): Promise<DemoFixtures> {
 
   await db.query(`INSERT INTO demo_fixtures (key, value) VALUES ('demo', $1)`, [JSON.stringify(fx)]);
   return fx;
+}
+
+/**
+ * Every table this application owns (migrations + demo bookkeeping). The reset
+ * drops exactly these — never the whole schema — so it works with a database
+ * user that does not own the schema, and leaves anything else untouched.
+ */
+const APP_TABLES = [
+  'event_imports', 'event_pass_deliveries', 'event_contact_challenges', 'event_verifications', 'event_access_events',
+  'event_gate_operators', 'event_gates', 'event_credentials', 'event_participants', 'events',
+  'audit_logs', 'attendance_records', 'sessions', 'venue_qr_codes', 'locations', 'volunteers',
+  'schema_migrations', 'demo_fixtures',
+];
+
+/** Demo mode only: delete all application data, recreate the tables and load fresh demo data. */
+export async function resetDemoData(ctx: AppContext): Promise<DemoFixtures> {
+  await ctx.db.exec(`DROP TABLE IF EXISTS ${APP_TABLES.join(', ')} CASCADE`);
+  await runMigrations(ctx.db);
+  return seedDemo(ctx);
 }
 
 /** Re-centre demo sessions and events on "now" so live parts of the demo are open again. */

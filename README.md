@@ -38,6 +38,7 @@ Open http://localhost:5173/demo. It's a menu with **three short laptop + phone d
 - the venue QR codes;
 - an email outbox showing pass emails and verification codes, since demo mode doesn't send email;
 - a *Refresh demo times* button, which re-centres the sessions and events on the current time if you present hours after loading.
+- a **Reset demo data** button (on `/demo`, admin only) that wipes everything and reloads the original demo data.
 
 Other options:
 

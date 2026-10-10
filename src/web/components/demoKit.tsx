@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { api, type User } from '../api';
 import { useAuth } from '../auth';
 import { loadDemo, type DemoInfo } from '../demoInfo';
+import { ErrorMessage, Modal } from './ui';
 
 /** Sign in as a demo account (no-op if already signed in as it). */
 export async function signInAsDemo(demo: DemoInfo, key: string, current: User | null, setUser: (u: User) => void) {
@@ -104,5 +105,61 @@ export function BigQr({ src, url, caption }: { src: string; url: string; caption
         {url}
       </div>
     </figure>
+  );
+}
+
+/**
+ * Admin-only "Reset demo data" (demo mode): wipes everything, reloads the demo
+ * data, signs the laptop back in as the demo admin and reloads the page.
+ */
+export function ResetDemoButton({ label = 'Reset demo data' }: { label?: string }) {
+  const { user, setUser } = useAuth();
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<unknown>(null);
+
+  async function reset() {
+    setBusy(true);
+    setError(null);
+    try {
+      const demo = await loadDemo(true);
+      if (!demo?.seeded) throw new Error('Demo mode is off.');
+      await signInAsDemo(demo, 'admin', user, setUser);
+      await api.post('/demo/reset');
+      // Every account was recreated: sign in again with the new admin, then start fresh.
+      setUser(null);
+      const fresh = await loadDemo(true);
+      if (fresh?.seeded) await signInAsDemo(fresh, 'admin', null, setUser);
+      window.location.reload();
+    } catch (err) {
+      setError(err);
+      setBusy(false);
+    }
+  }
+
+  return (
+    <>
+      <button className="btn-danger" onClick={() => setOpen(true)}>
+        {label}
+      </button>
+      {open && (
+        <Modal title="Reset demo data?" onClose={() => !busy && setOpen(false)}>
+          <p>
+            This deletes <strong>everything</strong> — sessions, check-ins, participants, passes, scans and any changes made during demos — and loads fresh demo
+            data. Phones that are signed in will need to sign in again.
+          </p>
+          {busy && <p className="muted">Resetting… this takes 10–30 seconds. Please keep this page open.</p>}
+          <ErrorMessage error={error} />
+          <div className="actions">
+            <button className="btn-secondary" disabled={busy} onClick={() => setOpen(false)}>
+              Cancel
+            </button>
+            <button className="btn-danger" disabled={busy} onClick={reset}>
+              {busy ? 'Resetting…' : 'Yes, reset everything'}
+            </button>
+          </div>
+        </Modal>
+      )}
+    </>
   );
 }

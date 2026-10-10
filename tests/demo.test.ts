@@ -94,6 +94,28 @@ describe('demo data matches the demo guide', () => {
     expect(r.body.sessions).toBeGreaterThan(0);
   });
 
+  it('reset: admin only; wipes changes, reloads demo data, and ends the old session', async () => {
+    const priya = await signIn('priya');
+    expect((await priya.post('/api/demo/reset')).status).toBe(403);
+
+    // Make a change that the reset must undo.
+    const admin = await signIn('admin');
+    const created = await admin.post('/api/admin/locations', { name: 'Temporary venue', timezone: 'Asia/Singapore' });
+    expect(created.status).toBe(201);
+
+    const res = await admin.post('/api/demo/reset');
+    expect(res.status).toBe(200);
+    expect(res.body.ok).toBe(true);
+    // Accounts were recreated, so the old admin session no longer works.
+    expect((await admin.get('/api/auth/me')).status).toBe(401);
+
+    demo = (await request(env.app).get('/api/demo')).body;
+    const fresh = await signIn('admin');
+    const names = (await fresh.get('/api/admin/locations')).body.locations.map((l: { name: string }) => l.name);
+    expect(names).toEqual(['Science of the Soul – Amber', 'Science of the Soul – Tagore']);
+    expect((await fresh.get('/api/admin/events')).body.events).toHaveLength(4);
+  });
+
   it('demo endpoints do not exist outside demo mode', async () => {
     const plain = createApp({ ...env.ctx, config: { ...env.ctx.config, demoMode: false } });
     expect((await request(plain).get('/api/demo')).status).toBe(404);

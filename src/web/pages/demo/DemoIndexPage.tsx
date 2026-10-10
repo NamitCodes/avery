@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { PhoneReachability } from '../../components/demoKit';
+import { PhoneReachability, ResetDemoButton } from '../../components/demoKit';
 import { useDemo } from '../../demoInfo';
 
 const DEMOS = [
@@ -59,6 +59,17 @@ export function DemoIndexPage() {
           Open detailed guide
         </Link>
       </div>
+      {demo?.seeded && (
+        <div className="card demo-full">
+          <div>
+            <h2 style={{ margin: 0 }}>Start fresh</h2>
+            <p className="muted" style={{ margin: '0.25rem 0 0' }}>
+              Undo everything done in earlier demos and reload the original demo data. Signs this laptop in as the demo administrator.
+            </p>
+          </div>
+          <ResetDemoButton />
+        </div>
+      )}
       <p className="small muted" style={{ marginTop: '1.5rem' }}>
         Demo accounts all use the password <code className="mono">{demo?.seeded ? demo.password : 'demo1234'}</code>; the sign-in page lists them for one-tap login on
         phones.

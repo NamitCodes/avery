@@ -67,13 +67,9 @@ Without `DATABASE_URL` the app uses its embedded database on the instance's temp
 
 - **Wake the service.** Free web services sleep after about 15 minutes without traffic, and the first request then takes about a minute. Open the site a few minutes before you start.
 - **Refresh the demo times.** On `/demo`, press **Refresh demo times** in the *Reset* section. Today's sessions and the events then move around the current time.
-- **Full reset (Option A).** In Render, open the database → **Connect** → copy the PSQL command and run it, then run:
+- **Full reset.** Open `https://<name>.onrender.com/demo`, click **Reset demo data** (in "Start fresh"), and confirm. It takes about 10–30 seconds. It deletes everything done during demos, reloads the original demo data (including any changes to the demo data in a newly deployed version), and signs the laptop back in as the demo administrator. Phones must sign in again afterwards. The button exists only in demo mode and only an administrator can use it.
 
-  ```sql
-  DROP SCHEMA public CASCADE; CREATE SCHEMA public;
-  ```
-
-  Finally, in the web service click **Manual Deploy → Restart service**. On startup it re-creates the tables and reloads the demo data. For Option B, a restart alone is a full reset.
+  *Fallback if the site won't start:* in Render, open the database → **Connect** → **External Connection**, run the PSQL command, then run `DROP SCHEMA public CASCADE; CREATE SCHEMA public;`. Then, in the web service, click **Manual Deploy → Restart service**. For Option B, a restart alone is a full reset.
 - **Email.** In demo mode, emails are not sent. Pass emails and verification codes appear in the guide's **Email outbox**.
 
 ## Troubleshooting

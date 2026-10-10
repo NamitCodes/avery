@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { api, ROLE_LABEL, type Role, type User } from '../api';
 import { useAuth } from '../auth';
+import { ResetDemoButton } from '../components/demoKit';
 import { ErrorMessage } from '../components/ui';
 import { loadDemo, type DemoInfo } from '../demoInfo';
 import { formatDateTime } from '../format';
@@ -520,7 +521,8 @@ export function DemoPage() {
             </button>
           </li>
           <li>
-            <strong>Start completely fresh:</strong> stop the app and run <code className="mono">npm run demo</code> again (it wipes and reloads the demo database only).
+            <strong>Start completely fresh:</strong> deletes everything done during demos and reloads the original demo data (about 10–30 seconds).{' '}
+            <ResetDemoButton />
           </li>
         </ul>
       </section>

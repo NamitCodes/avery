@@ -1,10 +1,10 @@
 import QRCode from 'qrcode';
 import { Router } from 'express';
-import { requireRoles } from '../auth.js';
+import { clearSession, requireRoles } from '../auth.js';
 import type { AppContext } from '../context.js';
-import { badRequest, notFound } from '../errors.js';
+import { badRequest, conflict, notFound } from '../errors.js';
 import { demoOutbox } from '../mailer.js';
-import { DEMO_ACCOUNTS, DEMO_PASSWORD, demoFixtures, refreshDemoTimes } from '../demo/seed.js';
+import { DEMO_ACCOUNTS, DEMO_PASSWORD, demoFixtures, refreshDemoTimes, resetDemoData } from '../demo/seed.js';
 import { decryptToken, passUrl, qrDataUrl } from '../services/events/credentials.js';
 import { checkInUrl } from '../services/venues.js';
 
@@ -82,6 +82,25 @@ export function demoRoutes(ctx: AppContext) {
 
   r.get('/demo/sample-import.csv', (_req, res) => {
     res.attachment('sample-participants.csv').type('text/csv; charset=utf-8').send(`${SAMPLE_IMPORT}\r\n`);
+  });
+
+  /**
+   * Wipe everything and reload the demo data (admin only; this router exists only in
+   * demo mode). All accounts are recreated, so the caller's session ends.
+   */
+  let resetting = false;
+  r.post('/demo/reset', requireRoles(['ADMIN']), async (_req, res) => {
+    if (resetting) throw conflict('RESET_IN_PROGRESS', 'A reset is already running. Please wait.');
+    resetting = true;
+    const started = Date.now();
+    try {
+      await resetDemoData(ctx);
+      demoOutbox.messages = [];
+    } finally {
+      resetting = false;
+    }
+    clearSession(ctx, res);
+    res.json({ ok: true, seconds: Math.round((Date.now() - started) / 100) / 10 });
   });
 
   r.post('/demo/refresh', requireRoles(['ADMIN']), async (_req, res) => {
