@@ -78,11 +78,12 @@ export function DemoSummitPage() {
   );
 
   const signInUrl = `${base}/demo/signin/desk?next=${encodeURIComponent('/demo/phone')}`;
+  const oldPass = demo?.seeded ? demo.passes.find((p) => p.key === 'sofia-old') : undefined;
 
   return (
     <DemoPageShell
-      title="International summit — printed passes at the gate"
-      intro="Organisers import the participant list, everyone receives a printable pass, and gate staff scan it at entry and exit. The system always knows who is inside."
+      title="Planned visits — printed passes at the gate"
+      intro="Visitors are registered in advance and receive a printable pass. Gate staff scan it at the participant or event-volunteer gates, on the way in and out. The system always knows who is inside."
       demo={demo}
       error={signInError}
     >
@@ -119,10 +120,10 @@ export function DemoSummitPage() {
             <div>
               <p>The QR holds only a random code — no name, email or country. No phone or app is needed by the participant.</p>
               <p>
-                <strong>Phone:</strong> point the camera at the pass QR and tap the link. Then tap <strong>North Entry</strong>.
+                <strong>Phone:</strong> point the camera at the pass QR and tap the link. Then tap <strong>Participant entry</strong>.
               </p>
               <p className="small muted">
-                Then try: tap North Entry again → <strong>STOP, already inside</strong>. Tap <strong>North Exit</strong> → exit recorded. North Entry again → re-entry
+                Then try: tap Participant entry again → <strong>STOP, already inside</strong>. Tap <strong>Participant exit</strong> → exit recorded. Participant entry again → re-entry
                 with the same pass.
               </p>
             </div>
@@ -130,7 +131,22 @@ export function DemoSummitPage() {
         </DemoStep>
       )}
 
-      <DemoStep n={guest ? 4 : 3} who="Laptop" title="Watch the gate in real time">
+      {oldPass && (
+        <DemoStep n={guest ? 4 : 3} who="Screen" title="Try an old pass — entry denied">
+          <div className="demo-split">
+            <BigQr src={oldPass.qr_data_url} url={oldPass.pass_url} caption={<strong>Old pass — replaced after it was reported lost</strong>} />
+            <div>
+              <p>
+                <strong>Phone:</strong> scan this QR and tap <strong>Participant entry</strong>. The gate shows a red <strong>STOP</strong>: this pass was revoked when
+                a replacement was issued, so it no longer opens any gate.
+              </p>
+              <p className="small muted">The same happens for a photocopied or shared pass after it is replaced, a pass for a different event, or any QR that isn’t a pass.</p>
+            </div>
+          </div>
+        </DemoStep>
+      )}
+
+      <DemoStep n={(guest ? 4 : 3) + (oldPass ? 1 : 0)} who="Laptop" title="Watch the gate in real time">
         <div className="row" style={{ gap: '1rem', alignItems: 'stretch' }}>
           <div className="stat">
             <div className="value">{inside ?? '—'}</div>

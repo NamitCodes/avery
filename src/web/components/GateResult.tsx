@@ -24,7 +24,7 @@ export function ResultCard({
   onIdCheck,
 }: {
   outcome: AccessOutcome;
-  tz: string;
+  tz?: string;
   reentry: boolean;
   onIdCheck(outcome: 'CHECKED' | 'FAILED'): void;
 }) {

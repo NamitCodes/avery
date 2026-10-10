@@ -30,7 +30,7 @@ Open http://localhost:5173. To try the volunteer flow:
 npm run demo          # wipes & reloads the demo database (.data/demo), starts API + web
 ```
 
-Open http://localhost:5173/demo. It's a menu with **three short laptop + phone demos** (`/demo/volunteers`, `/demo/summit`, `/demo/open-event`) and the **detailed demo guide** (`/demo/full`). It has:
+Open http://localhost:5173/demo. It's a menu with **three short laptop + phone demos** (`/demo/weekly`, `/demo/planned`, `/demo/surprise`) and the **detailed demo guide** (`/demo/full`). It has:
 
 - step-by-step scripts for all three workflows, each with what to click and what to point out;
 - one-click "sign in as" buttons for every role (password `demo1234`);
@@ -51,7 +51,7 @@ Other options:
 |---|---|
 | `npm run dev` | API (tsx watch) + Vite dev server |
 | `npm test` | Test suite (in-memory PGlite, no external services needed). Set `TEST_DATABASE_URL=postgres://user@host:5432/postgres` to run it against a real PostgreSQL server; each file gets a throwaway database |
-| `npm run test:e2e` | Playwright browser tests against a running demo (`npm run demo` first; uses your installed Chrome; set `E2E_BASE_URL` to target another URL) |
+| `npm run test:e2e` | Playwright browser tests against a running demo (`npm run demo` first). Runs in your installed Chrome plus an iPhone/WebKit project (one-time: `npx playwright install webkit`). Set `E2E_BASE_URL` to target another URL |
 | `npm run typecheck` | Type-check the server, web and tests |
 | `npm run lint` | ESLint |
 | `npm run build` | Compile the server to `dist/server` and the SPA to `dist/web` |

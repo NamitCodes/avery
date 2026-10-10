@@ -53,45 +53,40 @@ test('home page and demo guide render without errors', async ({ page }) => {
   await expect(page.getByRole('heading', { name: 'Volunteer attendance' })).toBeVisible();
   await page.goto('/demo/full');
   await expect(page.getByRole('heading', { name: 'Full demo guide' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: /A · Volunteer attendance/ })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /A · Weekly check-in/ })).toBeVisible();
   await expect(page.locator('#passes img')).toHaveCount(demo.passes.length);
   expect(errors).toEqual([]);
 });
 
 test('guide button signs in as a volunteer and checks in at an overlapping-session venue', async ({ page }) => {
   await page.goto('/demo/full');
-  await page.getByRole('button', { name: /Scan Community Hall as Priya/ }).click();
+  await page.getByRole('button', { name: /Scan Tagore as Priya/ }).click();
   await expect(page).toHaveURL(/\/check-in\/v\//);
-  await expect(page.getByRole('heading', { name: 'Community Hall – Toa Payoh' })).toBeVisible();
-  await page.getByRole('button', { name: /Food packing/ }).click();
+  await expect(page.getByRole('heading', { name: 'Science of the Soul – Tagore' })).toBeVisible();
+  await page.getByRole('button', { name: /Wednesday Seva/ }).click();
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'Confirm attendance' }).click();
   await expect(page.getByRole('heading', { name: 'You’re checked in' })).toBeVisible();
   await expect(page.getByText('Tap-in time', { exact: true })).toBeVisible();
 
   // Scanning again returns the original record.
-  await page.goto(demo.venues.find((v) => v.key === 'hall')!.path);
-  await page.getByRole('button', { name: /Food packing/ }).click();
+  await page.goto(demo.venues.find((v) => v.key === 'tagore')!.path);
+  await page.getByRole('button', { name: /Wednesday Seva/ }).click();
   await page.getByRole('button', { name: 'Continue' }).click();
   await page.getByRole('button', { name: 'Confirm attendance' }).click();
   await expect(page.getByText('Already recorded')).toBeVisible();
 });
 
-test('a venue with nothing open shows the required message', async ({ page }) => {
-  await signIn(page, 'tom');
-  await page.goto(demo.venues.find((v) => v.key === 'east')!.path);
-  await expect(page.getByText('There are no activities currently accepting attendance at this venue.')).toBeVisible();
-});
-
 test('unauthenticated scan redirects to sign-in and resumes check-in', async ({ page }) => {
-  const path = demo.venues.find((v) => v.key === 'park')!.path;
+  const path = demo.venues.find((v) => v.key === 'amber')!.path;
   await page.goto(path);
   await expect(page).toHaveURL(/\/login\?next=/);
   await page.getByLabel('Email').fill('mei@demo.org');
   await page.getByLabel('Password').fill(demo.password);
   await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page).toHaveURL(new RegExp(path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
-  await expect(page.getByText('River clean-up')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Science of the Soul – Amber' })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Confirm attendance' })).toBeVisible();
 });
 
 test('gate scanner: exit, entry, duplicate entry, revoked pass', async ({ page }) => {
@@ -107,23 +102,23 @@ test('gate scanner: exit, entry, duplicate entry, revoked pass', async ({ page }
   };
 
   // Normalise Amara to OUTSIDE (exit is accepted or rejected depending on earlier runs).
-  await scanAt('north-exit', 'amara');
-  await expect(await scanAt('north-entry', 'amara')).toContainText('ENTRY OK');
-  const dup = await scanAt('north-entry', 'amara');
+  await scanAt('participant-exit', 'amara');
+  await expect(await scanAt('participant-entry', 'amara')).toContainText('ENTRY OK');
+  const dup = await scanAt('participant-entry', 'amara');
   await expect(dup).toContainText('STOP');
   await expect(dup).toContainText('Already inside');
   await expect(dup).toContainText('Amara Okafor');
 
-  const revoked = await scanAt('north-entry', 'sofia-old');
+  const revoked = await scanAt('participant-entry', 'sofia-old');
   await expect(revoked).toContainText('STOP');
   await expect(revoked).toContainText('revoked');
 });
 
 test('gate operator is limited to the assigned gate', async ({ page }) => {
   await signIn(page, 'gate');
-  await page.goto(`/staff/gate/${gate('north-exit')}`);
+  await page.goto(`/staff/gate/${gate('fair-lane')}`);
   await expect(page.getByText('You are not assigned to this gate.')).toBeVisible();
-  await page.goto(`/staff/gate/${gate('north-entry')}`);
+  await page.goto(`/staff/gate/${gate('participant-entry')}`);
   await expect(page.locator('.gate-mode')).toHaveText('ENTRY');
 });
 
@@ -141,7 +136,7 @@ test('event dashboard and participant search', async ({ page }) => {
 test('public registration works without an account', async ({ page }) => {
   const fair = demo.events.find((e) => e.key === 'fair')!.id;
   await page.goto(`/events/${fair}/register`);
-  await expect(page.getByRole('heading', { name: 'Neighbourhood Health Fair' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Science of the Soul' })).toBeVisible();
   await page.getByLabel(/Full name/).fill(`E2E Visitor ${Date.now()}`);
   await page.getByLabel(/Phone/).fill(`+65 8${String(Date.now()).slice(-7)}`);
   await page.getByRole('button', { name: 'Register' }).click();

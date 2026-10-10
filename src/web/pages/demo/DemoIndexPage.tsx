@@ -4,21 +4,21 @@ import { useDemo } from '../../demoInfo';
 
 const DEMOS = [
   {
-    to: '/demo/volunteers',
-    title: 'Volunteer check-in',
-    blurb: 'Daily volunteering with a printed venue QR.',
+    to: '/demo/weekly',
+    title: 'Weekly check-in',
+    blurb: 'Regular volunteering at a venue with a printed QR.',
     steps: ['Laptop creates today’s session', 'Venue QR on screen', 'Phone signs in as a volunteer and scans', 'Laptop shows the check-in live'],
   },
   {
-    to: '/demo/summit',
-    title: 'International summit',
-    blurb: 'Imported participants, printed passes, entry & exit gates.',
+    to: '/demo/planned',
+    title: 'Planned visits',
+    blurb: 'Pre-registered visitors with printed passes; participant and event-volunteer entry & exit gates.',
     steps: ['Phone becomes a gate scanner', 'Laptop adds a participant and shows the pass', 'Phone scans: entry, exit, re-entry', 'Laptop shows who is inside'],
   },
   {
-    to: '/demo/open-event',
-    title: 'Open community event',
-    blurb: 'Online registration without accounts, plus walk-ins.',
+    to: '/demo/surprise',
+    title: 'Surprise visits',
+    blurb: 'Science of the Soul, Amber Road — register online without an account, or just walk in.',
     steps: ['Registration QR on screen', 'Phone registers as a visitor', 'Laptop checks them in', 'Walk-in without a phone'],
   },
 ];

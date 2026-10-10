@@ -40,35 +40,34 @@ afterAll(() => env.close());
 describe('demo data matches the demo guide', () => {
   it('exposes accounts, venues, gates and sample passes', () => {
     expect(demo.accounts).toHaveLength(7);
-    expect(demo.venues).toHaveLength(3);
+    expect(demo.venues.map((v) => v.key)).toEqual(['tagore', 'amber']);
     expect(demo.passes.map((p) => p.key)).toEqual(['amara', 'lucas', 'hiroshi', 'sofia-old', 'fair-grace', 'fair-peter', 'awards-grace']);
     expect(demo.passes.find((p) => p.key === 'sofia-old')!.status).toBe('REVOKED');
   });
 
   it('story A: overlapping sessions, preselected session, empty venue, idempotent rescan', async () => {
     const priya = await signIn('priya');
-    expect((await priya.get(`/api/check-in/venues/${venue('hall')}`)).body.sessions.map((s: { title: string }) => s.title)).toEqual(['Food packing', 'Homework club']);
-    expect((await priya.get(`/api/check-in/venues/${venue('park')}`)).body.sessions).toHaveLength(1);
-    expect((await priya.get(`/api/check-in/venues/${venue('east')}`)).body.sessions).toHaveLength(0);
+    expect((await priya.get(`/api/check-in/venues/${venue('tagore')}`)).body.sessions.map((s: { title: string }) => s.title)).toEqual(['Wednesday Seva', 'Sunday Seva']);
+    expect((await priya.get(`/api/check-in/venues/${venue('amber')}`)).body.sessions).toHaveLength(1);
 
     const tom = await signIn('tom');
-    const food = (await tom.get(`/api/check-in/venues/${venue('hall')}`)).body.sessions[0];
-    const again = await tom.post('/api/check-in', { venue_id: venue('hall'), session_id: food.id });
+    const food = (await tom.get(`/api/check-in/venues/${venue('tagore')}`)).body.sessions[0];
+    const again = await tom.post('/api/check-in', { venue_id: venue('tagore'), session_id: food.id });
     expect(again.body.status).toBe('ALREADY_CHECKED_IN');
   });
 
   it('story B: gate outcomes for each sample pass', async () => {
     const gabe = await signIn('gate');
-    expect((await scan(gabe, 'north-entry', 'amara')).body).toMatchObject({ result: 'ACCEPTED', event_type: 'ENTRY' });
-    expect((await scan(gabe, 'north-entry', 'amara')).body.code).toBe('ALREADY_INSIDE');
-    expect((await scan(gabe, 'north-entry', 'lucas')).body.code).toBe('ALREADY_INSIDE');
-    expect((await scan(gabe, 'north-entry', 'hiroshi')).body.result).toBe('ACCEPTED');
-    expect((await scan(gabe, 'north-entry', 'sofia-old')).body.code).toBe('REVOKED_CREDENTIAL');
-    expect((await scan(gabe, 'north-entry', 'fair-peter')).body.code).toBe('WRONG_EVENT');
-    expect((await scan(gabe, 'north-exit', 'lucas')).status).toBe(403); // not assigned
+    expect((await scan(gabe, 'participant-entry', 'amara')).body).toMatchObject({ result: 'ACCEPTED', event_type: 'ENTRY' });
+    expect((await scan(gabe, 'participant-entry', 'amara')).body.code).toBe('ALREADY_INSIDE');
+    expect((await scan(gabe, 'participant-entry', 'lucas')).body.code).toBe('ALREADY_INSIDE');
+    expect((await scan(gabe, 'participant-entry', 'hiroshi')).body.result).toBe('ACCEPTED');
+    expect((await scan(gabe, 'participant-entry', 'sofia-old')).body.code).toBe('REVOKED_CREDENTIAL');
+    expect((await scan(gabe, 'participant-entry', 'fair-peter')).body.code).toBe('WRONG_EVENT');
+    expect((await scan(gabe, 'fair-lane', 'lucas')).status).toBe(403); // not assigned to other events' gates
 
     const desk = await signIn('desk');
-    expect((await scan(desk, 'north-exit', 'lucas')).body.result).toBe('ACCEPTED');
+    expect((await scan(desk, 'participant-exit', 'lucas')).body.result).toBe('ACCEPTED');
 
     const events = await signIn('events');
     const summit = demo.events.find((e) => e.key === 'summit')!.id;

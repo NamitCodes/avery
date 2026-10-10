@@ -5,7 +5,9 @@ import { BigQr, DemoPageShell, DemoStep, usePolling, usePresenter } from '../../
 import { ErrorMessage } from '../../components/ui';
 import { formatTimeWithSeconds } from '../../format';
 
-const VENUE_NAME = 'Demo Hall';
+const VENUE_NAME = 'Science of the Soul – Amber';
+/** Names used by earlier versions of this demo; renamed in place so printed QRs keep working. */
+const OLD_VENUE_NAMES = ['Demo Hall', 'Wednesday Seva, Amber Road', 'Amber Road'];
 
 interface Row {
   id: string;
@@ -22,7 +24,7 @@ export function DemoVolunteerPage() {
   const { demo, error: signInError, ready } = usePresenter();
   const [venue, setVenue] = useState<Location | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [title, setTitle] = useState(`Food bank shift ${hhmm()}`);
+  const [title, setTitle] = useState(`Wednesday Seva ${hhmm()}`);
   const [rows, setRows] = useState<Row[]>([]);
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
@@ -32,7 +34,9 @@ export function DemoVolunteerPage() {
     try {
       const { locations } = await api.get<{ locations: Location[] }>('/admin/locations');
       let v = locations.find((l) => l.name === VENUE_NAME) ?? null;
-      if (!v) v = (await api.post<{ location: Location }>('/admin/locations', { name: VENUE_NAME, address: 'Live demo venue', timezone: 'Asia/Singapore' })).location;
+      const old = v ? null : locations.find((l) => OLD_VENUE_NAMES.includes(l.name));
+      if (old) v = (await api.patch<{ location: Location }>(`/admin/locations/${old.id}`, { name: VENUE_NAME, address: '', reason: 'Demo venue renamed' })).location;
+      if (!v) v = (await api.post<{ location: Location }>('/admin/locations', { name: VENUE_NAME, address: '', timezone: 'Asia/Singapore' })).location;
       if (!v.active_qr) await api.post(`/admin/locations/${v.id}/qr-codes`, { reason: 'Demo' });
       const fresh = (await api.get<{ location: Location }>(`/admin/locations/${v.id}`)).location;
       setVenue(fresh);
@@ -68,7 +72,7 @@ export function DemoVolunteerPage() {
       });
       setSession(res.session);
       setRows([]);
-      setTitle(`Food bank shift ${hhmm()}`);
+      setTitle(`Wednesday Seva ${hhmm()}`);
     } catch (err) {
       setError(err);
     } finally {
@@ -91,7 +95,7 @@ export function DemoVolunteerPage() {
 
   return (
     <DemoPageShell
-      title="Volunteer check-in"
+      title="Weekly check-in"
       intro="Every venue has one printed QR code. Volunteers scan it with their phone, pick their activity, and the organiser sees them arrive instantly."
       demo={demo}
       error={signInError}

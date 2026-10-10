@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { Link, Navigate, NavLink, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
 import { DESK_STAFF, EVENT_MANAGERS, GATE_STAFF } from './api';
 import { RequireAuth, useAuth } from './auth';
 import { AuditPage } from './pages/admin/AuditPage';
@@ -117,9 +117,13 @@ export function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/demo" element={<DemoIndexPage />} />
         <Route path="/demo/full" element={<DemoPage />} />
-        <Route path="/demo/volunteers" element={<DemoVolunteerPage />} />
-        <Route path="/demo/summit" element={<DemoSummitPage />} />
-        <Route path="/demo/open-event" element={<DemoOpenEventPage />} />
+        <Route path="/demo/weekly" element={<DemoVolunteerPage />} />
+        <Route path="/demo/planned" element={<DemoSummitPage />} />
+        <Route path="/demo/surprise" element={<DemoOpenEventPage />} />
+        {/* Earlier demo links keep working. */}
+        <Route path="/demo/volunteers" element={<Navigate to="/demo/weekly" replace />} />
+        <Route path="/demo/summit" element={<Navigate to="/demo/planned" replace />} />
+        <Route path="/demo/open-event" element={<Navigate to="/demo/surprise" replace />} />
         <Route path="/me/attendance" element={<RequireAuth><MyAttendancePage /></RequireAuth>} />
 
         <Route path="/admin/sessions" element={<RequireAuth roles={['ADMIN']}><SessionsPage /></RequireAuth>} />

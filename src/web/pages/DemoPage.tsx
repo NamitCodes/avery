@@ -124,9 +124,9 @@ export function DemoPage() {
       <nav className="toc small">
         <a href="#setup">Before you start</a>
         <a href="#accounts">Accounts</a>
-        <a href="#story-a">A · Volunteer attendance</a>
-        <a href="#story-b">B · International summit</a>
-        <a href="#story-c">C · Open events</a>
+        <a href="#story-a">A · Weekly check-in</a>
+        <a href="#story-b">B · Planned visits</a>
+        <a href="#story-c">C · Surprise visits</a>
         <a href="#passes">Sample passes</a>
         <a href="#venue-qrs">Venue QR codes</a>
         <a href="#outbox">Email outbox</a>
@@ -201,59 +201,53 @@ export function DemoPage() {
       </section>
 
       <section id="story-a" className="demo-section">
-        <h2>A · Volunteer attendance with a printed venue QR</h2>
+        <h2>A · Weekly check-in with a printed venue QR</h2>
         <p className="muted">
           Message: one reusable QR per venue; volunteers choose the activity; the server records the time; duplicates and closed sessions are handled safely.
         </p>
         <ol className="steps">
           <Step title="Show the venue poster">
-            <Go as="admin" to={`/admin/qr/${venue('hall').qr_id}/print`}>
-              Open Community Hall QR poster
+            <Go as="admin" to={`/admin/qr/${venue('tagore').qr_id}/print`}>
+              Open the Tagore QR poster
             </Go>
             <Point>The QR only identifies the venue. It contains no login or session information, so it can stay on the wall all year.</Point>
           </Step>
           <Step title="Scan as a volunteer — choose between overlapping sessions">
-            <Go as="priya" to={venue('hall').path}>
-              Scan Community Hall as Priya
+            <Go as="priya" to={venue('tagore').path}>
+              Scan Tagore as Priya
             </Go>
             <Point>
-              Two activities are open at the same venue at the same time, so Priya chooses one. Pick <em>Food packing</em>, then press <em>Confirm attendance</em>.
+              Two activities are open at the same venue at the same time, so Priya chooses one. Pick <em>Wednesday Seva</em>, then press <em>Confirm attendance</em>.
               The confirmation shows the server’s tap-in time.
             </Point>
           </Step>
           <Step title="Scan again — no duplicate">
-            <Go as="priya" to={venue('hall').path}>
-              Scan Community Hall again
+            <Go as="priya" to={venue('tagore').path}>
+              Scan Tagore again
             </Go>
-            <Point>Confirm Food packing again: the original tap-in time is returned, not a second record. Network retries behave the same way.</Point>
+            <Point>Confirm Wednesday Seva again: the original tap-in time is returned, not a second record. Network retries behave the same way.</Point>
           </Step>
           <Step title="Same volunteer, another session the same day">
-            <Go as="priya" to={venue('park').path}>
-              Scan Riverside Park as Priya
+            <Go as="priya" to={venue('amber').path}>
+              Scan Amber as Priya
             </Go>
             <Point>Only one session is open here, so it is preselected. Priya now has two separate records today.</Point>
             <Go as="priya" to="/me/attendance">
               Show Priya’s history
             </Go>
           </Step>
-          <Step title="Nothing open at a venue">
-            <Go as="tom" to={venue('east').path}>
-              Scan East Coast Centre as Tom
-            </Go>
-            <Point>This morning’s session has closed and the afternoon one was cancelled: “There are no activities currently accepting attendance at this venue.”</Point>
-          </Step>
           <Step title="Admin: live session dashboard">
             <Go as="admin" to="/admin/sessions">
               Open sessions list
             </Go>
             <Point>
-              Filters by date, venue, activity and status; counts per session. Open <em>Food packing</em>: the list refreshes every 10 s while check-in is open — Priya
+              Filters by date, venue, activity and status; counts per session. Open <em>Wednesday Seva</em>: the list refreshes every 10 s while check-in is open — Priya
               appears there.
             </Point>
           </Step>
           <Step title="Manual add and correction (always with a reason)">
             <Point>
-              On <em>Food packing</em>, press <em>Add manually</em>, search “Jasmine”, give a reason (e.g. “No phone”). Then press <em>Correct</em> on any row to change the
+              On <em>Wednesday Seva</em>, press <em>Add manually</em>, search “Jasmine”, give a reason (e.g. “No phone”). Then press <em>Correct</em> on any row to change the
               time or void it — a reason is required and the original value is kept in the history.
             </Point>
             <Go as="admin" to="/admin/audit">
@@ -266,13 +260,13 @@ export function DemoPage() {
             </Point>
           </Step>
           <Step title="Revoke a compromised QR">
-            <Go as="admin" to={`/admin/venues/${venue('park').id}`}>
-              Open Riverside Park venue
+            <Go as="admin" to={`/admin/venues/${venue('amber').id}`}>
+              Open the Amber venue
             </Go>
             <Point>
               Press <em>Revoke</em>. Then try{' '}
-              <Go as="tom" to={venue('park').path}>
-                scanning Riverside Park as Tom
+              <Go as="tom" to={venue('amber').path}>
+                scanning Amber as Tom
               </Go>{' '}
               — blocked immediately. Back as admin, press <em>Generate QR code</em> to print a replacement. Existing attendance is untouched.
             </Point>
@@ -281,7 +275,7 @@ export function DemoPage() {
       </section>
 
       <section id="story-b" className="demo-section">
-        <h2>B · International summit — passes, gates, re-entry</h2>
+        <h2>B · Planned visits — passes, gates, re-entry</h2>
         <p className="muted">
           Message: organisers’ list in, printable passes out, fast unambiguous gates, exact occupancy, and every exception handled at the desk with an audit trail.
         </p>
@@ -320,8 +314,8 @@ export function DemoPage() {
             <Point>The QR holds only a random code — no name, email or country. Participants print it; no phone or app needed at the gate.</Point>
           </Step>
           <Step title="Gate: entry, duplicate, exit, re-entry">
-            <Go as="gate" to={`/staff/gate/${gate('north-entry').id}`}>
-              Open North Entry scanner
+            <Go as="gate" to={`/staff/gate/${gate('participant-entry').id}`}>
+              Open Participant entry scanner
             </Go>
             <div className="row" style={{ marginTop: '0.5rem' }}>
               <CopyPass k="amara" />
@@ -333,10 +327,10 @@ export function DemoPage() {
               <strong>STOP</strong> (already inside). Hiroshi left earlier → re-entry accepted with the same pass. The screen shows gate, mode and operator; never e-mail
               addresses.
             </Point>
-            <Go as="desk" to={`/staff/gate/${gate('north-exit').id}`}>
-              Open North Exit scanner
+            <Go as="desk" to={`/staff/gate/${gate('participant-exit').id}`}>
+              Open Participant exit scanner
             </Go>
-            <Point>Paste Lucas → EXIT OK. Back at North Entry he can now enter again.</Point>
+            <Point>Paste Lucas → EXIT OK. Back at Participant entry he can now enter again.</Point>
           </Step>
           <Step title="Rejected passes never change occupancy">
             <div className="row">
@@ -344,15 +338,15 @@ export function DemoPage() {
               <CopyPass k="fair-peter" />
             </div>
             <Point>
-              At North Entry: Sofia’s old pass (replaced after she lost it) → <strong>revoked</strong>; a Health Fair pass → <strong>different event</strong>; any random
+              At Participant entry: Sofia’s old pass (replaced after she lost it) → <strong>revoked</strong>; a Science of the Soul pass → <strong>different event</strong>; any random
               text → <strong>not recognised</strong>. Then show that the dashboard’s rejected-scan counts went up but “Inside now” did not.
             </Point>
           </Step>
           <Step title="Gate operators are limited">
-            <Go as="gate" to={`/staff/gate/${gate('north-exit').id}`}>
-              Try North Exit as Gabe
+            <Go as="gate" to={`/staff/gate/${gate('fair-lane').id}`}>
+              Try the Science of the Soul Fast lane as Gabe
             </Go>
-            <Point>Gabe is assigned only to North Entry, so this is refused. Gate operators also cannot open participant records or change data.</Point>
+            <Point>Gabe is assigned only to the Planned-visits gates, so this gate is refused. Gate operators also cannot open participant records or change data.</Point>
           </Step>
           <Step title="Exception desk: lost pass">
             <Go as="desk" to={`/staff/desk/${summit.id}`}>
@@ -382,20 +376,20 @@ export function DemoPage() {
       </section>
 
       <section id="story-c" className="demo-section">
-        <h2>C · Open events — online registration, walk-ins, identity assurance</h2>
+        <h2>C · Surprise visits — online registration, walk-ins, identity assurance</h2>
         <p className="muted">
           Message: everyone admitted has a registration and a check-in record; the level of identity checking is chosen per event; nobody needs a smartphone.
         </p>
         <ol className="steps">
           <Step title="Online registration without an account">
             <a className="btn btn-secondary btn-sm" href={`/events/${fair.id}/register`} target="_blank" rel="noreferrer">
-              Open the Health Fair public form
+              Open the Science of the Soul public form
             </a>
             <Point>Register with a phone number only. A printable pass appears immediately. Submitting the same email/phone again does not create a duplicate.</Point>
           </Step>
           <Step title="Fast check-in — counted once">
             <Go as="desk" to={`/staff/gate/${gate('fair-lane').id}`}>
-              Open Health Fair Fast lane
+              Open Science of the Soul Fast lane
             </Go>
             <div className="row" style={{ marginTop: '0.5rem' }}>
               <CopyPass k="fair-grace" />
@@ -404,7 +398,7 @@ export function DemoPage() {
           </Step>
           <Step title="Walk-in desk with duplicate search">
             <Go as="desk" to={`/staff/desk/${fair.id}`}>
-              Open the Health Fair desk
+              Open the Science of the Soul desk
             </Go>
             <Point>
               Register a walk-in named “Rachel Goh” → the desk shows a possible existing registration (matched on name) before creating anything. Then register “Mdm
@@ -441,7 +435,7 @@ export function DemoPage() {
               ID-checked, checked-in and inside.
             </Point>
             <Go as="events" to={`/admin/events/${fair.id}`}>
-              Health Fair overview
+              Science of the Soul overview
             </Go>
           </Step>
         </ol>

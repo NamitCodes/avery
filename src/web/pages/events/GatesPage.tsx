@@ -128,7 +128,7 @@ export function GatesPage() {
           <div className="form-grid">
             <label>
               Name
-              <input value={form.name} onChange={(ev) => setForm({ ...form, name: ev.target.value })} required placeholder="e.g. North Entry 1" />
+              <input value={form.name} onChange={(ev) => setForm({ ...form, name: ev.target.value })} required placeholder="e.g. Participant entry" />
             </label>
             <label>
               Mode

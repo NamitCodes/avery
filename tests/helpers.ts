@@ -116,7 +116,7 @@ export async function loginAdmin(env: TestEnv, role = 'ADMIN'): Promise<Client> 
   return c;
 }
 
-export async function createVenue(admin: Client, name = 'Community Hall') {
+export async function createVenue(admin: Client, name = 'Science of the Soul – Tagore') {
   const res = await admin.post('/api/admin/locations', { name, address: '1 Main St', timezone: 'Asia/Singapore' });
   if (res.status !== 201) throw new Error(`create venue failed: ${res.status} ${JSON.stringify(res.body)}`);
   return res.body.location as { id: string; name: string; active_qr: { id: string; public_identifier: string; url: string } };
@@ -133,7 +133,7 @@ export async function createSession(
 ) {
   const res = await admin.post('/api/admin/sessions', {
     location_id: locationId,
-    title: opts.title ?? 'Beach clean-up',
+    title: opts.title ?? 'Sunday Seva',
     start_at: opts.start ?? '2026-10-10T09:00',
     end_at: opts.end ?? '2026-10-10T12:00',
     checkin_opens_at: opts.opens,

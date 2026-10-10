@@ -94,7 +94,7 @@ describe('check-in', () => {
     expect(res.body.status).toBe('CHECKED_IN');
     expect(res.body.attendance.tapped_in_at).toBe(`${date}T01:07:00.000Z`);
     expect(res.body.attendance.source).toBe('QR');
-    expect(res.body.session.title).toBe('Beach clean-up');
+    expect(res.body.session.title).toBe('Sunday Seva');
     expect(res.body.venue.name).toBe('Hall A');
   });
 

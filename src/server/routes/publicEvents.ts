@@ -1,7 +1,7 @@
 import { Router, type RequestHandler } from 'express';
 import { z } from 'zod';
 import type { AppContext } from '../context.js';
-import { notFound } from '../errors.js';
+import { AppError, notFound } from '../errors.js';
 import { registrationCount, type EventRow, type ParticipantRow } from '../services/events/common.js';
 import { buildPass, extractToken, hashToken, type CredentialRow } from '../services/events/credentials.js';
 import { registerOnline } from '../services/events/registration.js';
@@ -88,7 +88,10 @@ export function publicEventRoutes(ctx: AppContext, publicLimiter: RequestHandler
       [hashToken(token)],
     );
     const row = rows[0];
-    if (!row || row.c.status !== 'ACTIVE' || row.p.status !== 'ACTIVE') throw missing;
+    if (!row) throw missing;
+    if (row.c.status !== 'ACTIVE' || row.p.status !== 'ACTIVE') {
+      throw new AppError(404, 'PASS_NOT_FOUND', missing.message, { event_id: row.e.id });
+    }
     const event = { ...row.e, starts_at: new Date(row.e.starts_at), ends_at: new Date(row.e.ends_at) };
     res.set('Cache-Control', 'no-store').set('Referrer-Policy', 'no-referrer').json({ pass: await buildPass(ctx.config, event, row.p, token) });
   });

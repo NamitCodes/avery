@@ -62,7 +62,7 @@ export function DemoOpenEventPage() {
 
   return (
     <DemoPageShell
-      title="Open event — register online or just walk in"
+      title="Surprise visits — register online or just walk in"
       intro="Anyone can register in advance from their phone, without creating an account. People who just turn up are registered at the desk — even without a phone. Every admitted person gets a check-in record."
       demo={demo}
       error={signInError}
@@ -72,7 +72,7 @@ export function DemoOpenEventPage() {
 
       <DemoStep n={1} who="Screen" title="Show the registration QR">
         <div className="demo-split">
-          {registerUrl && <BigQr src={qrSrc(registerUrl)} url={registerUrl} caption={<strong>Neighbourhood Health Fair — register</strong>} />}
+          {registerUrl && <BigQr src={qrSrc(registerUrl)} url={registerUrl} caption={<strong>Science of the Soul, Amber Road — register</strong>} />}
           <p>This is what goes on the flyer or the event website.</p>
         </div>
       </DemoStep>

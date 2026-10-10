@@ -3,6 +3,7 @@
  * live sessions and events are open when the demo starts; `refreshDemoTimes`
  * re-centres them later. Never used in production (see config).
  */
+import { DateTime } from 'luxon';
 import { generateVolunteerCode, hashPassword, type AuthUser } from '../auth.js';
 import type { Clock } from '../clock.js';
 import type { AppContext } from '../context.js';
@@ -24,9 +25,9 @@ export const DEMO_ACCOUNTS = [
   { key: 'admin', email: 'admin@demo.org', name: 'Avery Admin', role: 'ADMIN', label: 'Administrator — everything' },
   { key: 'events', email: 'events@demo.org', name: 'Eli Events', role: 'EVENT_ADMIN', label: 'Event administrator' },
   { key: 'desk', email: 'desk@demo.org', name: 'Dana Desk', role: 'EXCEPTION_DESK', label: 'Exception desk' },
-  { key: 'gate', email: 'gate@demo.org', name: 'Gabe Gate', role: 'GATE_OPERATOR', label: 'Gate operator (North Entry only)' },
+  { key: 'gate', email: 'gate@demo.org', name: 'Gabe Gate', role: 'GATE_OPERATOR', label: 'Gate operator (Planned-visits gates only)' },
   { key: 'priya', email: 'priya@demo.org', name: 'Priya Raman', role: 'VOLUNTEER', label: 'Volunteer — not checked in yet' },
-  { key: 'tom', email: 'tom@demo.org', name: 'Tom Okoro', role: 'VOLUNTEER', label: 'Volunteer — already checked in to “Food packing”' },
+  { key: 'tom', email: 'tom@demo.org', name: 'Tom Okoro', role: 'VOLUNTEER', label: 'Volunteer — already checked in to “Wednesday Seva”' },
   { key: 'mei', email: 'mei@demo.org', name: 'Mei Tan', role: 'VOLUNTEER', label: 'Volunteer — has attendance history' },
 ] as const;
 
@@ -158,9 +159,11 @@ export async function seedDemo(baseCtx: AppContext): Promise<DemoFixtures> {
     fx.venues.push({ key, id: result.id, name, qr_id: result.qr.id, public_identifier: result.qr.public_identifier, note });
     return result.id;
   };
-  const hall = await venue('hall', 'Community Hall – Toa Payoh', 'Blk 190 Lor 6 Toa Payoh', 'Two overlapping open sessions → session picker');
-  const park = await venue('park', 'Riverside Park', 'Kallang Riverside, Gate 3', 'One open session → preselected');
-  const east = await venue('east', 'East Coast Centre', '1000 East Coast Parkway', 'Nothing open now → “no activities” message');
+  // The organisation's two centres. Tagore: two overlapping open sessions (volunteer
+  // picks one). Amber: a single open session (preselected) — also the venue used by
+  // the "Weekly check-in" presenter demo.
+  const tagore = await venue('tagore', 'Science of the Soul – Tagore', '', 'Two overlapping open sessions → volunteer picks one');
+  const amber = await venue('amber', 'Science of the Soul – Amber', '', 'One open session → preselected');
 
   const session = async (
     locationId: string,
@@ -190,29 +193,39 @@ export async function seedDemo(baseCtx: AppContext): Promise<DemoFixtures> {
 
   // Live: wide windows so the demo stays valid for a few hours after seeding.
   const live = { opensBeforeMin: 45, closesAfterMin: 180 };
-  const food = await session(hall, 'Food packing', 'Pack grocery bags for 200 families. Main hall.', { startOffsetMin: -10, durationMin: 150, ...live });
-  await session(hall, 'Homework club', 'Help primary-school children with homework. Room 2.', { startOffsetMin: 5, durationMin: 120, ...live });
-  await session(hall, 'Evening sorting shift', 'Sort donated clothing.', { startOffsetMin: 300, durationMin: 120, opensBeforeMin: 15, closesAfterMin: 60 });
-  await session(park, 'River clean-up', 'Gloves and bags provided. Meet at Gate 3.', { startOffsetMin: -5, durationMin: 150, ...live });
-  const planting = await session(east, 'Morning tree planting', 'Plant 50 saplings along the coast.', { startOffsetMin: -360, durationMin: 120, opensBeforeMin: 15, closesAfterMin: 60 });
-  await session(east, 'Kite-making workshop', 'Cancelled due to weather.', { startOffsetMin: 60, durationMin: 90, opensBeforeMin: 15, closesAfterMin: 60, cancelled: true });
+  // Only the organisation's recurring sessions: Wednesday, Saturday and Sunday Seva.
+  // Today's live sessions keep these names whatever weekday the demo runs on, so
+  // something is always open to scan; past history sits on real Wed/Sat/Sun dates.
+  const wednesdaySeva = await session(tagore, 'Wednesday Seva', 'Kitchen & langar service. Main hall.', { startOffsetMin: -10, durationMin: 150, ...live });
+  await session(tagore, 'Sunday Seva', 'Cleaning & setup. Room 2.', { startOffsetMin: 5, durationMin: 120, ...live });
+  await session(tagore, 'Saturday Seva', 'Evening shift — sorting donations.', { startOffsetMin: 300, durationMin: 120, opensBeforeMin: 15, closesAfterMin: 60 });
+  await session(amber, 'Saturday Seva', 'Parking & traffic marshals.', { startOffsetMin: -5, durationMin: 150, ...live });
+  const morningSeva = await session(amber, 'Sunday Seva', 'Morning shift.', { startOffsetMin: -360, durationMin: 120, opensBeforeMin: 15, closesAfterMin: 60 });
+  await session(amber, 'Wednesday Seva', 'Cancelled due to weather.', { startOffsetMin: 60, durationMin: 90, opensBeforeMin: 15, closesAfterMin: 60, cancelled: true });
 
-  await attend(food.id, users.tom.id, minutes(food.start, -2));
-  for (const [i, v] of extras.slice(0, 4).entries()) await attend(food.id, v, minutes(food.start, -8 + i));
-  for (const [i, v] of [users.mei.id, ...extras.slice(2, 8)].entries()) await attend(planting.id, v, minutes(planting.start, -10 + i * 3));
+  await attend(wednesdaySeva.id, users.tom.id, minutes(wednesdaySeva.start, -2));
+  for (const [i, v] of extras.slice(0, 4).entries()) await attend(wednesdaySeva.id, v, minutes(wednesdaySeva.start, -8 + i));
+  for (const [i, v] of [users.mei.id, ...extras.slice(2, 8)].entries()) await attend(morningSeva.id, v, minutes(morningSeva.start, -10 + i * 3));
 
-  // Past weekends (history, CSV exports, volunteer history page).
-  for (const [w, title, loc] of [[7, 'Food packing', hall], [7, 'River clean-up', park], [14, 'Homework club', hall], [21, 'Beach clean-up', east]] as const) {
-    const past = await session(loc, title, '', { startOffsetMin: -w * 24 * 60, durationMin: 120, opensBeforeMin: 15, closesAfterMin: 60 }, false);
-    const people = [users.mei.id, users.tom.id, ...extras.slice(w % 5, (w % 5) + 5)];
+  // History: every Wednesday, Saturday and Sunday of the last three weeks, 09:00 local
+  // (volunteer history page, CSV exports).
+  const today = DateTime.now().setZone(TZ).startOf('day');
+  const venues = [tagore, amber];
+  for (let back = 1, n = 0; back <= 21; back++) {
+    const day = today.minus({ days: back }).set({ hour: 9 });
+    if (![3, 6, 7].includes(day.weekday)) continue; // Wed, Sat, Sun
+    const offset = Math.round((day.toMillis() - Date.now()) / 60_000);
+    const past = await session(venues[n % 2], `${day.toFormat('cccc')} Seva`, '', { startOffsetMin: offset, durationMin: 180, opensBeforeMin: 15, closesAfterMin: 60 }, false);
+    const people = [users.mei.id, users.tom.id, ...extras.slice(n % 5, (n % 5) + 5)];
     for (const [i, v] of people.entries()) await attend(past.id, v, minutes(past.start, -12 + i * 2));
+    n++;
   }
 
-  // A corrected record (audited) on the tree-planting session.
-  const late = await attend(planting.id, extras[9], minutes(planting.start, 55));
+  // A corrected record (audited) on this morning's Sunday Seva.
+  const late = await attend(morningSeva.id, extras[9], minutes(morningSeva.start, 55));
   clock.at(-30);
   await adminCorrectAttendance(ctx, admin.id, late, {
-    tappedInAt: minutes(planting.start, 2),
+    tappedInAt: minutes(morningSeva.start, 2),
     reason: 'Arrived on time but phone battery died; scanned later at the desk',
   });
   clock.release();
@@ -241,7 +254,7 @@ export async function seedDemo(baseCtx: AppContext): Promise<DemoFixtures> {
   const participantByName = async (eventId: string, name: string) =>
     (await db.query<{ id: string }>('SELECT id FROM event_participants WHERE event_id = $1 AND name = $2', [eventId, name])).rows[0].id;
 
-  // 1) International summit: imported list, passes, entry/exit/re-entry.
+  // 1) Planned visits: imported list, printed passes, entry/exit/re-entry.
   const summit = await createEvent(
     'summit',
     {
@@ -280,10 +293,13 @@ export async function seedDemo(baseCtx: AppContext): Promise<DemoFixtures> {
   });
   await processDeliveries(ctx);
 
-  const north = await gate('summit', summit, 'north-entry', 'North Entry', 'ENTRY', 'Main doors, Bayfront side');
-  const northExit = await gate('summit', summit, 'north-exit', 'North Exit', 'EXIT', 'Main doors, Bayfront side');
-  const vip = await gate('summit', summit, 'vip-entry', 'Speakers Entry', 'ENTRY', 'Loading bay');
-  await db.query('INSERT INTO event_gate_operators (gate_id, operator_id) VALUES ($1, $2)', [north, users.gate.id]);
+  const north = await gate('summit', summit, 'participant-entry', 'Participant entry', 'ENTRY', 'Main doors');
+  const northExit = await gate('summit', summit, 'participant-exit', 'Participant exit', 'EXIT', 'Main doors');
+  const vip = await gate('summit', summit, 'volunteer-entry', 'Event volunteer entry', 'ENTRY', 'Side door');
+  const volunteerExit = await gate('summit', summit, 'volunteer-exit', 'Event volunteer exit', 'EXIT', 'Side door');
+  for (const g of [north, northExit, vip, volunteerExit]) {
+    await db.query('INSERT INTO event_gate_operators (gate_id, operator_id) VALUES ($1, $2)', [g, users.gate.id]);
+  }
 
   // Sofia lost her pass yesterday: replaced at the desk (old pass now revoked).
   const sofiaId = await participantByName(summit, 'Sofia Rossi');
@@ -305,7 +321,7 @@ export async function seedDemo(baseCtx: AppContext): Promise<DemoFixtures> {
   await gateScan(ctx, users.gate, { gateId: north, scanned: sofiaOld.token, idempotencyKey: null }); // old pass → rejected
   for (const [i, name] of ['Hiroshi Tanaka', 'Aisha Rahman', 'Mateo García', 'Chloé Dubois'].entries()) {
     clock.at(-30 + i * 2);
-    await gateScan(ctx, users.desk, { gateId: northExit, scanned: tokens[name].token, idempotencyKey: null });
+    await gateScan(ctx, users.desk, { gateId: i === 3 ? volunteerExit : northExit, scanned: tokens[name].token, idempotencyKey: null });
   }
   clock.at(-10);
   await gateScan(ctx, users.gate, { gateId: north, scanned: tokens['Mateo García'].token, idempotencyKey: null }); // re-entry
@@ -315,19 +331,19 @@ export async function seedDemo(baseCtx: AppContext): Promise<DemoFixtures> {
   const lucasId = await participantByName(summit, 'Lucas Silva');
   const hiroshiId = await participantByName(summit, 'Hiroshi Tanaka');
   fx.passes.push(
-    { key: 'amara', label: 'Amara Okafor — valid pass, outside', note: 'Scan at North Entry → ENTRY OK. Scan again → ALREADY INSIDE.', event_key: 'summit', participant_id: amaraId, credential_id: tokens['Amara Okafor'].credentialId, expect: 'ENTRY OK' },
-    { key: 'lucas', label: 'Lucas Silva — valid pass, inside', note: 'Scan at North Entry → STOP (already inside). Scan at North Exit → EXIT OK, then entry works again.', event_key: 'summit', participant_id: lucasId, credential_id: tokens['Lucas Silva'].credentialId, expect: 'STOP — already inside' },
-    { key: 'hiroshi', label: 'Hiroshi Tanaka — exited earlier', note: 'Scan at North Entry → re-entry accepted with the same pass.', event_key: 'summit', participant_id: hiroshiId, credential_id: tokens['Hiroshi Tanaka'].credentialId, expect: 'ENTRY OK (re-entry)' },
+    { key: 'amara', label: 'Amara Okafor — valid pass, outside', note: 'Scan at Participant entry → ENTRY OK. Scan again → ALREADY INSIDE.', event_key: 'summit', participant_id: amaraId, credential_id: tokens['Amara Okafor'].credentialId, expect: 'ENTRY OK' },
+    { key: 'lucas', label: 'Lucas Silva — valid pass, inside', note: 'Scan at Participant entry → STOP (already inside). Scan at Participant exit → EXIT OK, then entry works again.', event_key: 'summit', participant_id: lucasId, credential_id: tokens['Lucas Silva'].credentialId, expect: 'STOP — already inside' },
+    { key: 'hiroshi', label: 'Hiroshi Tanaka — exited earlier', note: 'Scan at Participant entry → re-entry accepted with the same pass.', event_key: 'summit', participant_id: hiroshiId, credential_id: tokens['Hiroshi Tanaka'].credentialId, expect: 'ENTRY OK (re-entry)' },
     { key: 'sofia-old', label: 'Sofia Rossi — OLD pass (replaced)', note: 'Scan anywhere → STOP: revoked. Her replacement pass works.', event_key: 'summit', participant_id: sofiaId, credential_id: sofiaOld.credentialId, expect: 'STOP — revoked' },
   );
 
-  // 2) Open community fair: online registrations + walk-ins, single check-in.
+  // 2) Surprise visits (Science of the Soul, Amber Road): online registrations + walk-ins, single check-in.
   const fair = await createEvent(
     'fair',
     {
-      name: 'Neighbourhood Health Fair',
-      description: 'Free health screenings, talks and activities. Everyone welcome — register online or just walk in.',
-      venue_text: 'Toa Payoh Hub Atrium',
+      name: 'Science of the Soul',
+      description: 'Talks and meditation, open to everyone — register online or just walk in.',
+      venue_text: 'Amber Road',
       reentry_enabled: false,
       advance_registration_enabled: true,
       walk_ins_enabled: true,
@@ -371,7 +387,7 @@ export async function seedDemo(baseCtx: AppContext): Promise<DemoFixtures> {
     (await db.query<{ id: string }>(`SELECT id FROM event_credentials WHERE participant_id = $1 AND status = 'ACTIVE'`, [pid])).rows[0].id;
   fx.passes.push(
     { key: 'fair-grace', label: 'Grace Yeo — registered online, not checked in', note: 'Scan at Fast lane → CHECKED IN. Scan again → already checked in (not counted twice).', event_key: 'fair', participant_id: fairGrace, credential_id: await credOf(fairGrace), expect: 'CHECKED IN' },
-    { key: 'fair-peter', label: 'Peter Lim — health-fair pass', note: 'Scan at the SUMMIT North Entry → STOP: pass is for a different event.', event_key: 'fair', participant_id: fairPeter, credential_id: await credOf(fairPeter), expect: 'STOP — wrong event (at summit gates)' },
+    { key: 'fair-peter', label: 'Peter Lim — Science of the Soul pass', note: 'Scan at the Planned-visits Participant entry → STOP: pass is for a different event.', event_key: 'fair', participant_id: fairPeter, credential_id: await credOf(fairPeter), expect: 'STOP — wrong event (at Planned-visits gates)' },
   );
 
   // 3) Awards night: mandatory in-person photo ID check.

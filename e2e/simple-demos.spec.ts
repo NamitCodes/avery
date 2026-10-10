@@ -18,19 +18,19 @@ const qrUrl = async (laptop: Page, caption: RegExp) =>
 test('demo index lists the three demos', async ({ page }) => {
   await page.goto('/demo');
   await expect(page.getByRole('heading', { name: 'Demos', exact: true })).toBeVisible();
-  for (const name of ['Volunteer check-in', 'International summit', 'Open community event']) {
+  for (const name of ['Weekly check-in', 'Planned visits', 'Surprise visits']) {
     await expect(page.getByRole('heading', { name })).toBeVisible();
   }
 });
 
 test('volunteer demo: create session, phone scans venue QR, laptop sees check-in', async ({ page: laptop, browser }) => {
-  await laptop.goto('/demo/volunteers');
+  await laptop.goto('/demo/weekly');
   const title = `E2E shift ${Date.now()}`;
   await laptop.getByLabel('Session title').fill(title);
   await laptop.getByRole('button', { name: /Create (& open|another) session/ }).click();
   await expect(laptop.getByText(`Open now at`)).toContainText(title);
 
-  const venueUrl = await qrUrl(laptop, /Demo Hall — scan to check in/);
+  const venueUrl = await qrUrl(laptop, /Science of the Soul – Amber — scan to check in/);
   const mobile = await phone(browser);
   await mobile.goto(venueUrl);
   await expect(mobile).toHaveURL(/\/login\?next=/);
@@ -45,7 +45,7 @@ test('volunteer demo: create session, phone scans venue QR, laptop sees check-in
 });
 
 test('summit demo: phone becomes gate scanner, scans a new pass for entry, duplicate, exit', async ({ page: laptop, browser }) => {
-  await laptop.goto('/demo/summit');
+  await laptop.goto('/demo/planned');
   const signInUrl = await qrUrl(laptop, /gate staff/);
   const mobile = await phone(browser);
   await mobile.goto(signInUrl);
@@ -57,21 +57,21 @@ test('summit demo: phone becomes gate scanner, scans a new pass for entry, dupli
   expect(passUrl).toMatch(/\/pass\/EVP1\./);
 
   await mobile.goto(passUrl!);
-  await mobile.getByRole('button', { name: /North Entry/ }).click();
+  await mobile.getByRole('button', { name: /Participant entry/ }).click();
   await expect(mobile.locator('.gate-result')).toContainText('ENTRY OK');
   await expect(mobile.locator('.gate-result')).toContainText('Ama Mensah');
-  await mobile.getByRole('button', { name: /North Entry/ }).click();
+  await mobile.getByRole('button', { name: /Participant entry/ }).click();
   await expect(mobile.locator('.gate-result')).toContainText('STOP');
   await expect(laptop.locator('.stat', { hasText: 'Ama Mensah' })).toContainText('Inside', { timeout: 10_000 });
 
-  await mobile.getByRole('button', { name: /North Exit/ }).click();
+  await mobile.getByRole('button', { name: /Participant exit/ }).click();
   await expect(mobile.locator('.gate-result')).toContainText('EXIT OK');
   await expect(laptop.locator('.stat', { hasText: 'Ama Mensah' })).toContainText('Left the venue', { timeout: 10_000 });
   await mobile.context().close();
 });
 
 test('open-event demo: phone registers without account, laptop checks in; walk-in without phone', async ({ page: laptop, browser }) => {
-  await laptop.goto('/demo/open-event');
+  await laptop.goto('/demo/surprise');
   const registerUrl = await qrUrl(laptop, /register/);
   const mobile = await phone(browser);
   await mobile.goto(registerUrl);

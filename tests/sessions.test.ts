@@ -139,7 +139,7 @@ describe('session lifecycle', () => {
     const res = await admin.patch(`/api/admin/sessions/${s.id}`, { title: 'Renamed', reason: 'Typo' });
     expect(res.status).toBe(200);
     const audit = (await admin.get(`/api/admin/audit-logs?entity_id=${s.id}&action=session.update`)).body.audit_logs;
-    expect(audit[0].before_data.title).toBe('Beach clean-up');
+    expect(audit[0].before_data.title).toBe('Sunday Seva');
     expect(audit[0].after_data.title).toBe('Renamed');
   });
 });
