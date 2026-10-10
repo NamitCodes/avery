@@ -138,7 +138,14 @@ export function PublicPassPage() {
 
   return (
     <main>
-      <ErrorMessage error={error} />
+      {error instanceof ApiError && error.code === 'PASS_NOT_FOUND' ? (
+        <div className="pass-invalid" role="alert">
+          <div className="pass-invalid-title">Invalid pass</div>
+          <p>{error.message}</p>
+        </div>
+      ) : (
+        <ErrorMessage error={error} />
+      )}
       {staffPanel}
       {data && <PassCard pass={data.pass} />}
       {data && !isStaff && (

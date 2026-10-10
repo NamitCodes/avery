@@ -218,3 +218,8 @@ tr.demo-new td { background: #f0fdf4; }
 .demo-full { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
 
 .gate-btn { white-space: normal; flex-wrap: wrap; line-height: 1.3; }
+
+/* Invalid / replaced pass: impossible to miss */
+.pass-invalid { background: var(--bad); color: #fff; border-radius: 10px; padding: 1.5rem 1.25rem; margin: 0 auto 1.25rem; max-width: 640px; text-align: center; }
+.pass-invalid-title { font-size: 2.2rem; font-weight: 800; letter-spacing: 0.02em; line-height: 1.1; text-transform: uppercase; }
+.pass-invalid p { font-size: 1.2rem; margin: 0.75rem 0 0; }
