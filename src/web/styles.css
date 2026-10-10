@@ -184,3 +184,35 @@ td .row { gap: 0.4rem; flex-wrap: nowrap; }
 .step-point { color: #333; font-size: 0.93rem; margin: 0.4rem 0 0; }
 .step-point .btn-sm { vertical-align: baseline; }
 .demo-inline { display: inline-block; padding: 0 0.4rem; border: 1px solid #d4d4d4; border-radius: var(--radius); font-size: 0.85rem; }
+
+/* Simple presenter demos (readable on a projector) */
+.lead { font-size: 1.1rem; color: #333; max-width: 760px; }
+.simple-demo h1 { font-size: 1.9rem; }
+.demo-step { border-top: 1px solid var(--line); padding: 1.25rem 0 0.5rem; }
+.demo-step-head { display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.75rem; }
+.demo-step-head h2 { margin: 0; font-size: 1.25rem; }
+.demo-step-n { width: 2rem; height: 2rem; border-radius: 50%; background: var(--fg); color: #fff; display: grid; place-items: center; font-weight: 700; flex: none; }
+.demo-who { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; border: 1px solid currentColor; border-radius: 999px; padding: 0.05rem 0.5rem; color: var(--muted); }
+.demo-who-phone { color: #1d4ed8; }
+.demo-who-screen { color: var(--warn); }
+.demo-split { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr); gap: 2rem; align-items: start; }
+.big-qr { margin: 0; text-align: center; }
+.big-qr img { width: 300px; height: 300px; max-width: 70vw; max-height: 70vw; border: 1px solid var(--line); border-radius: 8px; }
+.big-qr figcaption { margin: 0.5rem 0 0.25rem; }
+.demo-list { padding-left: 1.2rem; font-size: 1.05rem; }
+.demo-list li + li { margin-top: 0.4rem; }
+tr.demo-new td { background: #f0fdf4; }
+.demo-cards { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 1.5rem; }
+.demo-card { text-decoration: none; display: flex; flex-direction: column; }
+.demo-card h2 { margin-top: 0; }
+.demo-card ol { padding-left: 1.1rem; flex: 1; }
+.demo-card .btn { align-self: flex-start; }
+.demo-quick { margin-bottom: 1.25rem; }
+.demo-quick .choice { padding: 0.6rem 0.8rem; }
+.gate-actions { max-width: 520px; margin: 0 auto 1.5rem; text-align: center; }
+.gate-actions .gate-result { margin-top: 1rem; }
+.gate-btn { margin-top: 0.5rem; font-size: 1.1rem; padding: 1rem; }
+.gate-btn-exit { background: var(--bg); color: var(--fg); }
+@media (max-width: 760px) { .demo-split { grid-template-columns: 1fr; } }
+.choice { white-space: normal; }
+.demo-full { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }

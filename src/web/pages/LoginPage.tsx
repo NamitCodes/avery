@@ -42,9 +42,33 @@ export function LoginPage() {
     <>
       <h1>Sign in</h1>
       {demo?.seeded && (
-        <div className="alert">
-          Demo: every account uses the password <code className="mono">{demo.password}</code>, e.g. <code className="mono">priya@demo.org</code>. See the{' '}
-          <Link to="/demo#accounts">demo guide</Link> for all roles.
+        <div className="card demo-quick">
+          <p className="small" style={{ marginTop: 0 }}>
+            <strong>Demo:</strong> tap an account to sign in (password <code className="mono">{demo.password}</code>).
+          </p>
+          {demo.accounts.map((a) => (
+            <button
+              key={a.key}
+              type="button"
+              className="choice"
+              disabled={busy}
+              onClick={async () => {
+                setBusy(true);
+                setError(null);
+                try {
+                  const res = await api.post<{ user: User }>('/auth/login', { email: a.email, password: demo.password });
+                  setUser(res.user);
+                  navigate(next, { replace: true });
+                } catch (err) {
+                  setError(err);
+                } finally {
+                  setBusy(false);
+                }
+              }}
+            >
+              <strong>{a.name}</strong> <span className="small muted">— {a.label}</span>
+            </button>
+          ))}
         </div>
       )}
       {next.startsWith('/check-in/') && <p className="muted">Sign in to record your attendance. You’ll return to the check-in page afterwards.</p>}

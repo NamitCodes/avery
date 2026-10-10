@@ -28,6 +28,11 @@ import { PublicPassPage } from './pages/public/PublicPassPage';
 import { PublicRegistrationPage } from './pages/public/PublicRegistrationPage';
 import { CheckInPage } from './pages/CheckInPage';
 import { DemoPage } from './pages/DemoPage';
+import { DemoIndexPage } from './pages/demo/DemoIndexPage';
+import { DemoOpenEventPage } from './pages/demo/DemoOpenEventPage';
+import { DemoPhonePage, DemoSignInPage } from './pages/demo/DemoPhonePages';
+import { DemoSummitPage } from './pages/demo/DemoSummitPage';
+import { DemoVolunteerPage } from './pages/demo/DemoVolunteerPage';
 import { useDemo } from './demoInfo';
 import { HomePage } from './pages/HomePage';
 import { LoginPage, RegisterPage } from './pages/LoginPage';
@@ -42,7 +47,7 @@ function Layout({ narrow = false }: { narrow?: boolean }) {
     <>
       {demo && (
         <div className="demo-banner no-print">
-          Demo mode — sample data only. <Link to="/demo">Open the demo guide</Link>
+          Demo mode — sample data only. <Link to="/demo">Demos</Link>
           {user && (
             <span className="muted">
               {' '}
@@ -56,7 +61,7 @@ function Layout({ narrow = false }: { narrow?: boolean }) {
           Attendance
         </Link>
         <nav>
-          {demo && <NavLink to="/demo">Demo guide</NavLink>}
+          {demo && <NavLink to="/demo">Demos</NavLink>}
           {user && <NavLink to="/me/attendance">My attendance</NavLink>}
           {user?.role === 'ADMIN' && (
             <>
@@ -104,11 +109,17 @@ export function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/check-in/v/:venueId" element={<RequireAuth><CheckInPage /></RequireAuth>} />
         <Route path="/events/:eventId/register" element={<PublicRegistrationPage />} />
+        <Route path="/demo/signin/:key" element={<DemoSignInPage />} />
+        <Route path="/demo/phone" element={<RequireAuth><DemoPhonePage /></RequireAuth>} />
       </Route>
 
       <Route element={<Layout />}>
         <Route path="/" element={<HomePage />} />
-        <Route path="/demo" element={<DemoPage />} />
+        <Route path="/demo" element={<DemoIndexPage />} />
+        <Route path="/demo/full" element={<DemoPage />} />
+        <Route path="/demo/volunteers" element={<DemoVolunteerPage />} />
+        <Route path="/demo/summit" element={<DemoSummitPage />} />
+        <Route path="/demo/open-event" element={<DemoOpenEventPage />} />
         <Route path="/me/attendance" element={<RequireAuth><MyAttendancePage /></RequireAuth>} />
 
         <Route path="/admin/sessions" element={<RequireAuth roles={['ADMIN']}><SessionsPage /></RequireAuth>} />

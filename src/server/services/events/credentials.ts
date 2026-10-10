@@ -147,6 +147,7 @@ export async function buildPass(config: Config, event: EventRow, participant: Pa
   const url = passUrl(config, token);
   return {
     event: {
+      id: event.id,
       name: event.name,
       starts_at: event.starts_at,
       ends_at: event.ends_at,

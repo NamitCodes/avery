@@ -110,7 +110,10 @@ export function DemoPage() {
 
   return (
     <div className="demo">
-      <h1>Demo guide</h1>
+      <p className="small muted">
+        <Link to="/demo">Demos</Link> /
+      </p>
+      <h1>Full demo guide</h1>
       <p className="muted">
         Sample data was loaded {formatDateTime(demo.seeded_at!)}
         {demo.refreshed_at && `, times refreshed ${formatDateTime(demo.refreshed_at)}`}. Everything here is fictional. This page only exists in demo mode.

@@ -46,7 +46,7 @@ export interface Participant {
 }
 
 export interface Pass {
-  event: { name: string; starts_at: string; ends_at: string; timezone: string; venue: string; instructions: string; reentry_enabled: boolean };
+  event: { id: string; name: string; starts_at: string; ends_at: string; timezone: string; venue: string; instructions: string; reentry_enabled: boolean };
   participant: { name: string; country: string; registration_reference: string };
   qr_data_url: string;
   pass_url: string;

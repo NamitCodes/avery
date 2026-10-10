@@ -5,7 +5,7 @@ import type { Pass } from '../pages/events/types';
 export function PassCard({ pass }: { pass: Pass }) {
   const e = pass.event;
   return (
-    <div className="pass">
+    <div className="pass" data-pass-url={pass.pass_url}>
       <div className="small muted">Entry pass</div>
       <div style={{ fontWeight: 600, fontSize: '1.1rem' }}>{e.name}</div>
       <div className="small">{formatRange(e.starts_at, e.ends_at, e.timezone)}</div>

@@ -30,7 +30,7 @@ Open http://localhost:5173. To try the volunteer flow:
 npm run demo          # wipes & reloads the demo database (.data/demo), starts API + web
 ```
 
-Open http://localhost:5173/demo for the **in-app demo guide**. It has:
+Open http://localhost:5173/demo. It's a menu with **three short laptop + phone demos** (`/demo/volunteers`, `/demo/summit`, `/demo/open-event`) and the **detailed demo guide** (`/demo/full`). It has:
 
 - step-by-step scripts for all three workflows, each with what to click and what to point out;
 - one-click "sign in as" buttons for every role (password `demo1234`);

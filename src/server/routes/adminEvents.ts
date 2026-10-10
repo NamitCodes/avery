@@ -290,7 +290,7 @@ export function adminEventRoutes(ctx: AppContext) {
          (SELECT c.id FROM event_credentials c WHERE c.participant_id = p.id AND c.status = 'ACTIVE') AS active_credential_id,
          (SELECT d.delivery_status FROM event_pass_deliveries d WHERE d.participant_id = p.id ORDER BY d.created_at DESC LIMIT 1) AS last_delivery_status
        FROM event_participants p WHERE ${where}
-       ORDER BY p.normalized_name, p.registration_reference
+       ORDER BY ${req.query.sort === 'recent' ? 'p.registered_at DESC' : 'p.normalized_name, p.registration_reference'}
        LIMIT ${pageSize} OFFSET ${(page - 1) * pageSize}`,
       params,
     );

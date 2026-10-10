@@ -35,7 +35,7 @@ git push -u origin main
    - builds with `npm ci --include=dev && npm run build`;
    - starts with `npm start`, which applies the database migrations and loads the demo data on first boot.
 4. Wait until the service shows **Live**. The first build takes about 3–5 minutes, and the log ends with `Demo data loaded. Guide: https://<name>.onrender.com/demo`.
-5. Open **`https://<name>.onrender.com/demo`**. That's the presenter's guide. Every account uses the password `demo1234`.
+5. Open **`https://<name>.onrender.com/demo`**. It offers three short laptop + phone demos (volunteer check-in, summit gate, open event) plus the detailed guide at `/demo/full`. Every account uses the password `demo1234`.
 
 You don't need to set `PUBLIC_BASE_URL`. The app uses Render's `RENDER_EXTERNAL_URL` automatically, so the venue QR codes and passes point at your `onrender.com` address and work from any phone.
 

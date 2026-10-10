@@ -1,7 +1,8 @@
+import QRCode from 'qrcode';
 import { Router } from 'express';
 import { requireRoles } from '../auth.js';
 import type { AppContext } from '../context.js';
-import { notFound } from '../errors.js';
+import { badRequest, notFound } from '../errors.js';
 import { demoOutbox } from '../mailer.js';
 import { DEMO_ACCOUNTS, DEMO_PASSWORD, demoFixtures, refreshDemoTimes } from '../demo/seed.js';
 import { decryptToken, passUrl, qrDataUrl } from '../services/events/credentials.js';
@@ -70,6 +71,13 @@ export function demoRoutes(ctx: AppContext) {
 
   r.get('/demo/outbox', (_req, res) => {
     res.json({ messages: demoOutbox.messages });
+  });
+
+  /** QR image for a link on this site (e.g. registration or phone sign-in), for showing on screen. */
+  r.get('/demo/qr.svg', async (req, res) => {
+    const text = String(req.query.text ?? '');
+    if (!text.startsWith(`${ctx.config.publicBaseUrl}/`)) throw badRequest('INVALID_QR_TEXT', 'Only links to this site can be encoded.');
+    res.type('image/svg+xml').send(await QRCode.toString(text, { type: 'svg', margin: 2, errorCorrectionLevel: 'M' }));
   });
 
   r.get('/demo/sample-import.csv', (_req, res) => {

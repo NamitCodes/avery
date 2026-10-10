@@ -51,15 +51,15 @@ test('home page and demo guide render without errors', async ({ page }) => {
   const errors = trackErrors(page);
   await page.goto('/');
   await expect(page.getByRole('heading', { name: 'Volunteer attendance' })).toBeVisible();
-  await page.getByRole('link', { name: 'Demo guide' }).first().click();
-  await expect(page.getByRole('heading', { name: 'Demo guide' })).toBeVisible();
+  await page.goto('/demo/full');
+  await expect(page.getByRole('heading', { name: 'Full demo guide' })).toBeVisible();
   await expect(page.getByRole('heading', { name: /A · Volunteer attendance/ })).toBeVisible();
   await expect(page.locator('#passes img')).toHaveCount(demo.passes.length);
   expect(errors).toEqual([]);
 });
 
 test('guide button signs in as a volunteer and checks in at an overlapping-session venue', async ({ page }) => {
-  await page.goto('/demo');
+  await page.goto('/demo/full');
   await page.getByRole('button', { name: /Scan Community Hall as Priya/ }).click();
   await expect(page).toHaveURL(/\/check-in\/v\//);
   await expect(page.getByRole('heading', { name: 'Community Hall – Toa Payoh' })).toBeVisible();
@@ -89,7 +89,7 @@ test('unauthenticated scan redirects to sign-in and resumes check-in', async ({ 
   await expect(page).toHaveURL(/\/login\?next=/);
   await page.getByLabel('Email').fill('mei@demo.org');
   await page.getByLabel('Password').fill(demo.password);
-  await page.getByRole('button', { name: 'Sign in' }).click();
+  await page.getByRole('button', { name: 'Sign in', exact: true }).click();
   await expect(page).toHaveURL(new RegExp(path.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
   await expect(page.getByText('River clean-up')).toBeVisible();
 });
